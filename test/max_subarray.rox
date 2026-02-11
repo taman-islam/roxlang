@@ -1,0 +1,44 @@
+function max_sub_array(nums <list[num32]>) -> num32 {
+    let n <num> = nums.size();
+
+    let r0 <rox_result[num32]> = nums.at(0);
+    if (isOk(r0) == false) { return 0n32; }
+
+    let max_so_far <num32> = getValue(r0);
+    let current_max <num32> = max_so_far;
+
+    repeat i in range(1, n, 1) {
+        let r <rox_result[num32]> = nums.at(i); // i is num
+        if (isOk(r) == false) { return 0n32; }
+        let x <num32> = getValue(r);
+
+        // current_max = max(x, current_max + x)
+        let sum <num32> = current_max + x;
+        if (x > sum) {
+             current_max = x;
+        } else {
+             current_max = sum;
+        }
+
+        if (current_max > max_so_far) {
+            max_so_far = current_max;
+        }
+    }
+
+    return max_so_far;
+}
+
+function main() -> none {
+    // nums = [-2, 1, -3, 4, -1, 2, 1, -5, 4]
+    // Use n32 literals for strict typing
+    let nums <list[num32]> = [-2n32, 1n32, -3n32, 4n32, -1n32, 2n32, 1n32, -5n32, 4n32];
+
+    // Expected: 6 (from [4, -1, 2, 1])
+    let res <num32> = max_sub_array(nums);
+
+    if (res == 6n32) {
+        print(['M','a','x','i','m','u','m',' ','S','u','b','a','r','r','a','y',':',' ','P','a','s','s','e','d','\n']);
+    } else {
+        print(['M','a','x','i','m','u','m',' ','S','u','b','a','r','r','a','y',':',' ','F','a','i','l','e','d','\n']);
+    }
+}

@@ -18,6 +18,7 @@ private:
     const std::vector<std::unique_ptr<Stmt>>& statements;
     std::stringstream out;
     int indentLevel = 0;
+    std::string currentFunctionName = "";
 
     void emitIndent();
     void emit(const std::string& s);
@@ -38,6 +39,7 @@ private:
     void genExprStmt(ExprStmt* stmt);
 
     void genBinary(BinaryExpr* expr);
+    void genLogical(LogicalExpr* expr);
     void genUnary(UnaryExpr* expr);
     void genLiteral(LiteralExpr* expr);
     void genVariable(VariableExpr* expr);

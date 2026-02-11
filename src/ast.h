@@ -38,10 +38,25 @@ struct DictionaryType : Type {
     }
 };
 
+class RoxResultType : public Type {
+public:
+    std::unique_ptr<Type> valueType;
+    RoxResultType(std::unique_ptr<Type> valueType) : valueType(std::move(valueType)) {}
+    std::string toString() const override { return "result[" + valueType->toString() + "]"; }
+};
+
 // --- Expressions ---
 
 struct Expr {
     virtual ~Expr() = default;
+};
+
+struct LogicalExpr : Expr {
+    std::unique_ptr<Expr> left;
+    Token op;
+    std::unique_ptr<Expr> right;
+    LogicalExpr(std::unique_ptr<Expr> left, Token op, std::unique_ptr<Expr> right)
+        : left(std::move(left)), op(op), right(std::move(right)) {}
 };
 
 struct BinaryExpr : Expr {

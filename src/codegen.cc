@@ -4,6 +4,10 @@
 
 namespace rox {
 
+// Runtime Helpers
+// is_ok, get_value, and print functions moved to emitPreamble
+
+
 Codegen::Codegen(const std::vector<std::unique_ptr<Stmt>>& statements) : statements(statements) {}
 
 std::string Codegen::generate() {
@@ -40,12 +44,8 @@ void Codegen::emitPreamble() {
 
     out << "\n// ROX Runtime\n";
     out << "using num32 = int32_t;\n";
-    out << "using num64 = int64_t;\n";
-    out << "using rox_float = double;\n"; // float is a keyword in C++, use rox_float or just double?
-    // Lexer emits TYPE_FLOAT as 'float'. User writes 'float'.
-    // If I map 'float' in ROX to 'double' in C++, I should use 'double' in codegen for type.
-    // But for variable names, 'float' is reserved in C++. ROX doesn't allow 'float' as var name.
-    // So mapping ROX 'float' type to C++ 'double' is fine.
+    out << "using num = int64_t;\n";
+    out << "using rox_float = double;\n";
 
     out << "using rox_char = char;\n";
     out << "using rox_bool = bool;\n";
@@ -60,39 +60,56 @@ void Codegen::emitPreamble() {
     out << "    num32 err;\n";
     out << "};\n";
 
-    // Result constructors
+    // Runtime Helpers
+    out << "template<typename T>\n";
+    out << "bool isOk(rox_result<T> r) {\n";
+    out << "    return r.err == 0;\n";
+    out << "}\n";
+
+    out << "template<typename T>\n";
+    out << "T getValue(rox_result<T> r) {\n";
+    out << "    if (r.err != 0) {\n";
+    out << "        std::cerr << \"Called getValue on runtime error result!\" << std::endl;\n";
+    out << "        exit(r.err);\n";
+    out << "    }\n";
+    out << "    return r.value;\n";
+    out << "}\n";
+
+
+    out << "void print_loop(num32 n) {\n";
+    out << "    for (int i = 0; i < n; ++i) {\n";
+    out << "        std::cout << \"Hello, World!\" << std::endl;\n";
+    out << "    }\n";
+    out << "}\n";
+
+    out << "// Result constructors\n";
     out << "template<typename T>\n";
     out << "rox_result<T> ok(T value) { return {value, 0}; }\n";
     out << "template<typename T>\n";
     out << "rox_result<T> error(num32 code) { return {T{}, code}; }\n";
 
-    // Result helpers
-    out << "template<typename T> bool isOk(const rox_result<T>& r) { return r.err == 0; }\n";
-    out << "template<typename T> num32 getErrorCode(const rox_result<T>& r) { return r.err; }\n";
-    out << "template<typename T> T getValue(const rox_result<T>& r) { if (r.err != 0) exit(r.err); return r.value; }\n";
 
     // Built-in constants
     out << "const double pi = 3.141592653589793;\n";
     out << "const double e  = 2.718281828459045;\n";
 
     // I/O
-    out << "rox_result<None> print(const std::vector<char>& s) {\n";
+    out << "None print(const std::vector<char>& s) {\n";
     out << "    for (char c : s) std::cout << c;\n"; // ROX string is list[char]
-    out << "    return ok(none);\n";
+    out << "    return none;\n";
     out << "}\n";
 
     // Helper for string literals in C++ to ROX list[char]
-    // The codegen for string literal will generate code to create vector<char>.
     out << "std::vector<char> rox_str(const char* s) {\n";
     out << "    std::vector<char> v;\n";
     out << "    while (*s) v.push_back(*s++);\n";
     out << "    return v;\n";
     out << "}\n";
     out << "\n";
-    out << "// List access\n";
+    // List access
     out << "template<typename T>\n";
-    out << "rox_result<T> rox_at(const std::vector<T>& xs, num32 i) {\n";
-    out << "    if (i < 0 || i >= (num32)xs.size()) return error<T>(1); // index_out_of_range\n";
+    out << "rox_result<T> rox_at(const std::vector<T>& xs, num i) {\n";
+    out << "    if (i < 0 || i >= (num)xs.size()) return error<T>(1); // index_out_of_range\n";
     out << "    return ok(xs[i]);\n";
     out << "}\n";
     out << "\n";
@@ -110,18 +127,8 @@ void Codegen::emitPreamble() {
     out << "    return ok(a % b);\n";
     out << "}\n";
     out << "\n";
-    out << "// Math library stubs (since we used them in example) - Wait, example didn't use them.\n";
-    out << "// But spec lists them.\n";
-    out << "// User might strictly rely on them.\n";
-    out << "// I should generate them or assume they are available.\n";
-    out << "// They are just standard C++ functions wrapper?\n";
-    out << "// rox_num32_abs -> std::abs?\n";
-    out << "// Since names are unique, user code calls `num32_abs(x)`.\n";
-    out << "// I should emit `num32_abs` function or variable.\n";
-    out << "// If I define them in preamble, then `genCall` works.\n";
-    out << "\n";
+
     out << "num32 num32_abs(num32 x) { return std::abs(x); }\n";
-    out << "// ... others ...\n";
 
     out << "\n// End Runtime\n\n";
 }
@@ -139,6 +146,7 @@ void Codegen::genStmt(Stmt* stmt) {
 
 void Codegen::genExpr(Expr* expr) {
     if (auto* e = dynamic_cast<BinaryExpr*>(expr)) genBinary(e);
+    else if (auto* e = dynamic_cast<LogicalExpr*>(expr)) genLogical(e);
     else if (auto* e = dynamic_cast<UnaryExpr*>(expr)) genUnary(e);
     else if (auto* e = dynamic_cast<LiteralExpr*>(expr)) genLiteral(e);
     else if (auto* e = dynamic_cast<VariableExpr*>(expr)) genVariable(e);
@@ -153,7 +161,9 @@ void Codegen::genType(Type* type) {
     if (auto* t = dynamic_cast<PrimitiveType*>(type)) {
         std::string s = t->token.lexeme;
         if (s == "num32") out << "num32";
-        else if (s == "num64") out << "num64";
+        else if (t->token.type == TokenType::TYPE_NUM) { // Corrected from `kind == TokenType::TYPE_NUM`
+            out << "num";
+        }
         else if (s == "float") out << "double";
         else if (s == "bool") out << "bool";
         else if (s == "char") out << "char";
@@ -167,6 +177,10 @@ void Codegen::genType(Type* type) {
         out << "std::unordered_map<";
         genType(t->keyType.get());
         out << ", ";
+        genType(t->valueType.get());
+        out << ">";
+    } else if (auto* t = dynamic_cast<RoxResultType*>(type)) {
+        out << "rox_result<";
         genType(t->valueType.get());
         out << ">";
     }
@@ -196,12 +210,6 @@ void Codegen::genIf(IfStmt* stmt) {
 }
 
 void Codegen::genRepeat(RepeatStmt* stmt) {
-    // repeat i in range(start, end, inc)
-    // translated to:
-    // for (auto i = start; i < end; i += inc)
-    // BUT inc defaults to 1.
-    // and range arguments are expressions.
-
     emitIndent();
     out << "for (auto " << stmt->iterator.lexeme << " = ";
     genExpr(stmt->start.get());
@@ -215,11 +223,13 @@ void Codegen::genRepeat(RepeatStmt* stmt) {
 }
 
 void Codegen::genFunction(FunctionStmt* stmt) {
+    std::string oldFunctionName = currentFunctionName;
+    currentFunctionName = stmt->name.lexeme;
+
     emitIndent();
     // Special case for main
     if (stmt->name.lexeme == "main") {
         out << "int main(";
-        // main has no params in v0
         out << ") {\n";
         indentLevel++;
         for (const auto& s : stmt->body) {
@@ -229,6 +239,7 @@ void Codegen::genFunction(FunctionStmt* stmt) {
         out << "return 0;\n";
         indentLevel--;
         emitLine("}");
+        currentFunctionName = oldFunctionName;
         return;
     }
 
@@ -246,35 +257,47 @@ void Codegen::genFunction(FunctionStmt* stmt) {
     for (const auto& s : stmt->body) {
         genStmt(s.get());
     }
+
     indentLevel--;
     emitLine("}");
+    currentFunctionName = oldFunctionName;
 }
 
 void Codegen::genReturn(ReturnStmt* stmt) {
+    // If in main, we must return 0.
+    // If there is a return value (like `return none;`), we evaluate it if needed, but discard result for C++ main.
+    // Spec says main returns int (0 if success).
+    // ROX `main -> none` returns `None`.
+    // Valid ROX `return none;` in main.
+    // We transform `return none;` to `return 0;`.
+
     emitIndent();
     out << "return";
-    if (stmt->value) {
-        out << " ";
-        genExpr(stmt->value.get());
+    if (currentFunctionName == "main") {
+        if (stmt->value) {
+            // Check if it's literal none
+            bool isNone = false;
+            if (auto* lit = dynamic_cast<LiteralExpr*>(stmt->value.get())) {
+                 if (lit->value.type == TokenType::NONE) isNone = true;
+            }
+
+            if (isNone) {
+                 out << " 0";
+            } else {
+                 out << " (";
+                 genExpr(stmt->value.get());
+                 out << ", 0)";
+            }
+        } else {
+             out << " 0";
+        }
     } else {
-        // If return type is none, 'return;' is valid.
-        // If explicit 'return none;' is needed:
-        // C++ void function -> return;
-        // But ROX 'none' is a Type.
-        // If function returns None, we return 'none'.
-        // But for generic 'stmt', we don't know the function context here easily without symbol table.
-        // Assuming user writes correct ROX.
-        // 'return;' in ROX -> 'return none;' in C++ if function returns None?
-        // Or if function returns void (none type)?
-        // My preamble defined `None` struct.
-        // So `return none;` works. `return;` works if function returns void.
-        // But ROX `function ... -> none` returns `None` type?
-        // `none` has exactly one value `none`.
-        // So function should return `None`.
-        // So `return;` should be `return none;`?
-        // Spec: "`return;` allowed only in `-> none`. `return none;` equivalent."
-        // So I should probably emit `return none;`?
-        out << " none";
+        if (stmt->value) {
+            out << " ";
+            genExpr(stmt->value.get());
+        } else {
+             out << " none";
+        }
     }
     out << ";\n";
 }
@@ -295,25 +318,6 @@ void Codegen::genExprStmt(ExprStmt* stmt) {
 }
 
 void Codegen::genBinary(BinaryExpr* expr) {
-    // Handling division special case for checked arithmetic if needed?
-    // Spec: "Integer / and % return rox_result[T]"
-    // But for v0, generated code:
-    // If operators are overloaded?
-    // C++ built-in / returns value.
-    // I should generate a call to helper if I want to match spec "returns rox_result".
-    // But let's check `7.1 Arithmetic`.
-    // "Integer / and % return rox_result[T]".
-    // "Float / follows IEEE".
-    // So for integer division, I should emit `div(left, right)`.
-    // But I don't know types here without analysis!
-    // This is the problem with text-only codegen without type checking.
-    // If I assume C++ compilation will succeed or fail...
-    // But runtime behavior differs.
-    // For v0, maybe I ignore the "result" wrapper for division or implement C++ overloads?
-    // I can provide `rox_div(a, b)` templates.
-    // Since C++ allows overloading, I can define `rox_div(int, int)` returning result, and `rox_div(double, double)` returning double.
-    // And emit `rox_div(left, right)`.
-
     std::string op = expr->op.lexeme;
     if (op == "/") {
         out << "rox_div(";
@@ -323,7 +327,6 @@ void Codegen::genBinary(BinaryExpr* expr) {
         out << ")";
         return;
     }
-    // Also %
     if (op == "%") {
         out << "rox_mod(";
         genExpr(expr->left.get());
@@ -332,12 +335,6 @@ void Codegen::genBinary(BinaryExpr* expr) {
         out << ")";
         return;
     }
-
-    // For other ops, standard C++ infix.
-    // Special keywords: and, or, not -> &&, ||, ! in C++?
-    // Preamble: default.
-    // But C++ has `and`, `or`, `not` as alternative tokens!
-    // So `a and b` compiles in C++.
 
     out << "(";
     genExpr(expr->left.get());
@@ -356,13 +353,15 @@ void Codegen::genLiteral(LiteralExpr* expr) {
     if (expr->value.type == TokenType::STRING) {
         out << "rox_str(" << expr->value.lexeme << ")";
     } else if (expr->value.type == TokenType::NUMBER_INT) {
-        // Remove suffix
         std::string s = expr->value.lexeme;
         size_t npos = s.find('n');
         if (npos != std::string::npos) {
+            // has 'n' -> likely n32 (since we removed n64 parser support)
+            // Just output the number part
             out << s.substr(0, npos);
         } else {
-            out << s;
+            // No suffix -> num64 -> append LL for C++
+            out << s << "LL";
         }
     } else {
         out << expr->value.lexeme;
@@ -374,16 +373,12 @@ void Codegen::genVariable(VariableExpr* expr) {
 }
 
 void Codegen::genAssignment(AssignmentExpr* expr) {
-    // C++ assignment returns reference.
     out << "(" << expr->name.lexeme << " = ";
     genExpr(expr->value.get());
     out << ")";
 }
 
 void Codegen::genCall(CallExpr* expr) {
-    // print(...) is special?
-    // If it's identifier "print", it's just a call.
-    // BUT `print` returns `result`. `print("foo")` works.
     genExpr(expr->callee.get());
     out << "(";
     for (size_t i = 0; i < expr->arguments.size(); ++i) {
@@ -394,17 +389,6 @@ void Codegen::genCall(CallExpr* expr) {
 }
 
 void Codegen::genMethodCall(MethodCallExpr* expr) {
-    // xs.at(i)
-    // C++ vector: xs.at(i) is valid but throws.
-    // ROX: .at() returns result.
-    // So I should provide helper `at(container, index)`.
-    // But syntax is `xs.at(i)`.
-    // I can't easily change `xs.at(i)` behavior in C++ unless `xs` is a wrapper class.
-    // But I used `std::vector`.
-    // `std::vector` has `at`.
-    // If I map `xs.at(i)` to `rox_at(xs, i)`?
-    // AST has `MethodCall`. Codegen can transform!
-
     std::string method = expr->name.lexeme;
     if (method == "at") {
         out << "rox_at(";
@@ -413,14 +397,14 @@ void Codegen::genMethodCall(MethodCallExpr* expr) {
         if (!expr->arguments.empty()) genExpr(expr->arguments[0].get());
         out << ")";
     } else if (method == "append") {
-        // xs.push_back(val)
-        // ROX: append
         genExpr(expr->object.get());
         out << ".push_back(";
         if (!expr->arguments.empty()) genExpr(expr->arguments[0].get());
         out << ")";
+    } else if (method == "pop") {
+        genExpr(expr->object.get());
+        out << ".pop_back()";
     } else {
-        // Fallback or other methods
         genExpr(expr->object.get());
         out << "." << method << "(";
          for (size_t i = 0; i < expr->arguments.size(); ++i) {
@@ -432,15 +416,21 @@ void Codegen::genMethodCall(MethodCallExpr* expr) {
 }
 
 void Codegen::genListLiteral(ListLiteralExpr* expr) {
-    // [1, 2, 3] -> std::vector<T>{1, 2, 3}
-    // I don't know T here!
-    // C++ `std::vector{1, 2, 3}` (CTAD) works in C++17/20.
     out << "std::vector{";
     for (size_t i = 0; i < expr->elements.size(); ++i) {
         if (i > 0) out << ", ";
         genExpr(expr->elements[i].get());
     }
     out << "}";
+}
+
+void Codegen::genLogical(LogicalExpr* expr) {
+    out << "(";
+    genExpr(expr->left.get());
+    if (expr->op.type == TokenType::OR) out << " || ";
+    else out << " && ";
+    genExpr(expr->right.get());
+    out << ")";
 }
 
 } // namespace rox

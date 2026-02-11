@@ -1,0 +1,49 @@
+// Binary Search
+// Given sorted array nums, return index of target or -1.
+
+
+function binary_search_recursive(nums <list[num32]>, target <num32>, low <num>, high <num>) -> num {
+    if (low > high) {
+        return -1;
+    }
+
+    let diff <num> = high - low;
+    let r_div <rox_result[num]> = diff / 2;
+    if (isOk(r_div) == false) { return -1; }
+    let half <num> = getValue(r_div);
+
+    let mid <num> = low + half;
+
+    let r <rox_result[num32]> = nums.at(mid);
+    if (isOk(r) == false) { return -1; }
+    let midVal <num32> = getValue(r);
+
+    if (midVal == target) {
+        return mid;
+    } else if (midVal < target) {
+        return binary_search_recursive(nums, target, mid + 1, high);
+    } else {
+        return binary_search_recursive(nums, target, low, mid - 1);
+    }
+}
+
+function search(nums <list[num32]>, target <num32>) -> num {
+    let n <num> = nums.size();
+    if (n == 0) { return -1; }
+    return binary_search_recursive(nums, target, 0, n - 1);
+}
+
+function main() -> none {
+    let nums <list[num32]> = [-1n32, 0n32, 3n32, 5n32, 9n32, 12n32];
+
+    // Search for 9 (index 4)
+    if (search(nums, 9n32) == 4) {
+        // Search for 2 (not found)
+        if (search(nums, 2n32) == -1) {
+             print(['B','i','n','a','r','y',' ','S','e','a','r','c','h',':',' ','P','a','s','s','e','d','\n']);
+             return none;
+        }
+    }
+
+    print(['B','i','n','a','r','y',' ','S','e','a','r','c','h',':',' ','F','a','i','l','e','d','\n']);
+}

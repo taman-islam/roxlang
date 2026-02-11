@@ -152,7 +152,7 @@ std::unique_ptr<Expr> Parser::expression() {
 }
 
 std::unique_ptr<Expr> Parser::assignment() {
-    std::unique_ptr<Expr> expr = equality();
+    std::unique_ptr<Expr> expr = logic_or();
 
     if (match({TokenType::EQUAL})) {
         Token equals = previous();
@@ -166,6 +166,30 @@ std::unique_ptr<Expr> Parser::assignment() {
         }
 
         error(equals, "Invalid assignment target.");
+    }
+
+    return expr;
+}
+
+std::unique_ptr<Expr> Parser::logic_or() {
+    std::unique_ptr<Expr> expr = logic_and();
+
+    while (match({TokenType::OR})) {
+        Token op = previous();
+        std::unique_ptr<Expr> right = logic_and();
+        expr = std::make_unique<LogicalExpr>(std::move(expr), op, std::move(right));
+    }
+
+    return expr;
+}
+
+std::unique_ptr<Expr> Parser::logic_and() {
+    std::unique_ptr<Expr> expr = equality();
+
+    while (match({TokenType::AND})) {
+        Token op = previous();
+        std::unique_ptr<Expr> right = equality();
+        expr = std::make_unique<LogicalExpr>(std::move(expr), op, std::move(right));
     }
 
     return expr;
@@ -294,7 +318,7 @@ std::unique_ptr<Expr> Parser::primary() {
 }
 
 std::unique_ptr<Type> Parser::type() {
-    if (match({TokenType::TYPE_NUM32, TokenType::TYPE_NUM64, TokenType::TYPE_FLOAT,
+    if (match({TokenType::TYPE_NUM32, TokenType::TYPE_NUM, TokenType::TYPE_FLOAT,
                TokenType::TYPE_BOOL, TokenType::TYPE_CHAR, TokenType::NONE})) {
         return std::make_unique<PrimitiveType>(previous());
     }
@@ -313,6 +337,13 @@ std::unique_ptr<Type> Parser::type() {
         std::unique_ptr<Type> valueType = type();
         consume(TokenType::RIGHT_BRACKET, "Expect ']' after dictionary type.");
         return std::make_unique<DictionaryType>(std::move(keyType), std::move(valueType));
+    }
+
+    if (match({TokenType::TYPE_ROX_RESULT})) {
+        consume(TokenType::LEFT_BRACKET, "Expect '[' after rox_result.");
+        std::unique_ptr<Type> valueType = type();
+        consume(TokenType::RIGHT_BRACKET, "Expect ']' after rox_result type.");
+        return std::make_unique<RoxResultType>(std::move(valueType));
     }
 
     error(peek(), "Expect type.");

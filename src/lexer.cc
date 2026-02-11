@@ -28,12 +28,13 @@ static const std::map<std::string, TokenType> keywords = {
     {"range", TokenType::RANGE},
     {"not", TokenType::NOT},
     {"num32", TokenType::TYPE_NUM32},
-    {"num64", TokenType::TYPE_NUM64},
+    {"num", TokenType::TYPE_NUM},
     {"float", TokenType::TYPE_FLOAT},
     {"bool", TokenType::TYPE_BOOL},
     {"char", TokenType::TYPE_CHAR},
     {"list", TokenType::TYPE_LIST},
     {"dictionary", TokenType::TYPE_DICT},
+    {"rox_result", TokenType::TYPE_ROX_RESULT}, // New
 };
 
 Lexer::Lexer(const std::string& source) : source(source) {}
@@ -137,14 +138,18 @@ void Lexer::number() {
     }
 
     // Look for n32 suffix
-    if (peek() == 'n' && peekNext() == '3' && source.size() > current + 2 && source[current+2] == '2') {
-        advance(); // n
-        advance(); // 3
-        advance(); // 2
-        addToken(TokenType::NUMBER_INT); // num32
-    } else {
-        addToken(TokenType::NUMBER_INT); // num64 (default int)
+    if (peek() == 'n') {
+        if (peekNext() == '3' && source.size() > current + 2 && source[current+2] == '2') {
+             advance(); // n
+             advance(); // 3
+             advance(); // 2
+             addToken(TokenType::NUMBER_INT); // num32
+             return;
+        }
     }
+
+    addToken(TokenType::NUMBER_INT); // num64 (default int)
+    return;
 }
 
 void Lexer::string() {

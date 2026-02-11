@@ -1,0 +1,55 @@
+// Two Sum
+// Given nums array and target, return indices of two numbers that add up to target.
+
+function two_sum(nums <list[num32]>, target <num32>) -> list[num] {
+    let n <num> = nums.size();
+
+    // i, j are num from range
+    repeat i in range(0, n, 1) {
+        repeat j in range(i + 1, n, 1) {
+
+            // Handle result explicitly
+            let r1 <rox_result[num32]> = nums.at(i);
+            if (isOk(r1) == false) { return [-1, -1]; }
+            let v1 <num32> = getValue(r1);
+
+            let r2 <rox_result[num32]> = nums.at(j);
+            if (isOk(r2) == false) { return [-1, -1]; }
+            let v2 <num32> = getValue(r2);
+
+            if (v1 + v2 == target) {
+                return [i, j];
+            }
+        }
+    }
+    return [-1, -1];
+}
+
+function main() -> none {
+    // 2 is num64 by default. 2n32 is num32.
+    let nums <list[num32]> = [2n32, 7n32, 11n32, 15n32];
+    let target <num32> = 9n32;
+
+    let result <list[num]> = two_sum(nums, target);
+
+    // We expect [0, 1]
+    if (result.size() == 2) {
+        let r0 <rox_result[num]> = result.at(0);
+        let r1 <rox_result[num]> = result.at(1);
+
+        if (isOk(r0)) {
+            if (isOk(r1)) {
+                 if (getValue(r0) == 0) {
+                     if (getValue(r1) == 1) {
+                         // print(['T', 'w', 'o', ' ', 'S', 'u', 'm', ':', ' ', 'P', 'a', 's', 's', 'e', 'd', ' ', '(', '[', '0', ',', ' ', '1', ']', ')', '\n']);
+                         // Concatenating is tedious.
+                         print(['T','w','o',' ','S','u','m',':',' ','P','a','s','s','e','d','\n']);
+                         return none;
+                     }
+                 }
+            }
+        }
+    }
+
+    print(['F','a','i','l','e','d','\n']);
+}

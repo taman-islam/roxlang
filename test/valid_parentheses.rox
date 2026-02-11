@@ -1,0 +1,67 @@
+// Valid Parentheses
+// Given a string s containing just the characters '(', ')', '{', '}', '[' and ']', determine if the input string is valid.
+
+function is_valid(s <list[char]>) -> bool {
+    // Workaround: Initialize with one element and pop it to fix C++ CTAD for empty vector
+    let stack <list[char]> = ['a'];
+    stack.pop();
+
+    let n <num> = s.size();
+
+    repeat i in range(0, n, 1) {
+        let r <rox_result[char]> = s.at(i);
+        // If error, return false (invalid state)
+        if (isOk(r) == false) { return false; }
+        let c <char> = getValue(r);
+
+        if (c == '(') {
+            stack.append(c);
+        } else if (c == '{') {
+            stack.append(c);
+        } else if (c == '[') {
+            stack.append(c);
+        } else {
+            // Closing bracket
+            if (stack.size() == 0) {
+                return false;
+            }
+
+            // stack.size() is num. 1 is num.
+            let last_idx <num> = stack.size() - 1;
+            let rt <rox_result[char]> = stack.at(last_idx);
+            if (isOk(rt) == false) { return false; }
+            let top <char> = getValue(rt);
+
+            stack.pop();
+
+            if (c == ')') {
+                if (top != '(') { return false; }
+            } else if (c == '}') {
+                if (top != '{') { return false; }
+            } else if (c == ']') {
+                if (top != '[') { return false; }
+            }
+        }
+    }
+
+    return stack.size() == 0;
+}
+
+function main() -> none {
+    // ROX strings are list[char]. String literals are converted.
+
+    if (is_valid(['(', ')']) == true) {
+        if (is_valid(['(', ')', '[', ']', '{', '}']) == true) {
+            if (is_valid(['(', ']']) == false) {
+                 if (is_valid(['(', '[', ')', ']']) == false) {
+                      if (is_valid(['{', '[', ']', '}']) == true) {
+                          print(['V','a','l','i','d',' ','P','a','r','e','n','t','h','e','s','e','s',':',' ','P','a','s','s','e','d','\n']);
+                          return none;
+                      }
+                 }
+            }
+        }
+    }
+
+    print(['V','a','l','i','d',' ','P','a','r','e','n','t','h','e','s','e','s',':',' ','F','a','i','l','e','d','\n']);
+}

@@ -30,10 +30,13 @@ void writeFile(const std::string& path, const std::string& content) {
 std::string generate_cc(const std::string& source) {
     rox::Lexer lexer(source);
     std::vector<rox::Token> tokens = lexer.scanTokens();
+
     rox::Parser parser(tokens);
     std::vector<std::unique_ptr<rox::Stmt>> statements = parser.parse();
+
     rox::Codegen codegen(statements);
-    return codegen.generate();
+    std::string result = codegen.generate();
+    return result;
 }
 
 void cmd_generate(const std::string& inputPath) {

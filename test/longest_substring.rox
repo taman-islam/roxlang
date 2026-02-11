@@ -1,0 +1,74 @@
+// Longest Substring Without Repeating Characters
+// Given a string s, find the length of the longest substring without repeating characters.
+
+// Helper to check if char is in list
+function contains(items <list[char]>, c <char>) -> bool {
+    let n <num> = items.size();
+    repeat i in range(0, n, 1) {
+        let r <rox_result[char]> = items.at(i);
+        if (isOk(r)) {
+            let val <char> = getValue(r);
+            if (val == c) {
+                return true;
+            }
+function length_of_longest_substring(items <list[char]>) -> num {
+    let n <num> = items.size();
+    let max_len <num> = 0;
+
+    let left <num> = 0;
+
+    repeat k in range(0, n, 1) {
+       let r_k <rox_result[char]> = items.at(k);
+       if (isOk(r_k) == false) { return 0; }
+       let c <char> = getValue(r_k);
+
+       let found <bool> = false;
+       let found_index <num> = 0;
+
+       repeat j in range(left, k, 1) {
+           let r_j <rox_result[char]> = items.at(j);
+           if (isOk(r_j)) {
+                let char_j <char> = getValue(r_j);
+                if (char_j == c) {
+                    found = true;
+                    found_index = j;
+                }
+           }
+       }
+
+       if (found == true) {
+           if (found_index >= left) {
+               left = found_index + 1;
+           }
+       }
+
+       let current_len <num> = k - left + 1;
+       if (current_len > max_len) {
+           max_len = current_len;
+       }
+    }
+
+    return max_len;
+}
+
+function main() -> none {
+    // "abcabcbb" -> 3 ("abc")
+    // "bbbbb" -> 1 ("b")
+    // "pwwkew" -> 3 ("wke")
+
+    let s1 <list[char]> = ['a','b','c','a','b','c','b','b'];
+    if (length_of_longest_substring(s1) == 3) {
+
+        let s2 <list[char]> = ['b','b','b','b','b'];
+        if (length_of_longest_substring(s2) == 1) {
+
+            let s3 <list[char]> = ['p','w','w','k','e','w'];
+            if (length_of_longest_substring(s3) == 3) {
+                print(['L','o','n','g','e','s','t',' ','S','u','b','s','t','r','i','n','g',':',' ','P','a','s','s','e','d','\n']);
+                return none;
+            }
+        }
+    }
+
+    print(['L','o','n','g','e','s','t',' ','S','u','b','s','t','r','i','n','g',':',' ','F','a','i','l','e','d','\n']);
+}
