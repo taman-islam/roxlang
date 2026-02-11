@@ -295,7 +295,7 @@ std::unique_ptr<Expr> Parser::primary() {
 
 std::unique_ptr<Type> Parser::type() {
     if (match({TokenType::TYPE_NUM32, TokenType::TYPE_NUM64, TokenType::TYPE_FLOAT,
-               TokenType::TYPE_BOOL, TokenType::TYPE_CHAR})) {
+               TokenType::TYPE_BOOL, TokenType::TYPE_CHAR, TokenType::NONE})) {
         return std::make_unique<PrimitiveType>(previous());
     }
 
