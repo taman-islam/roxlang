@@ -1,0 +1,7 @@
+// Test lexer
+let x <num32> = 10n32;
+const pi <float> = 3.14;
+print("Hello, world!");
+if (x > 5) {
+  x = x + 1;
+}
