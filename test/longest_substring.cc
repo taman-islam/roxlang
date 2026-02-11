@@ -80,7 +80,7 @@ num32 num32_abs(num32 x) { return std::abs(x); }
 
 bool contains(std::vector<char> items, char c) {
   num n = items.size();
-  for (auto i = 0LL; i < n; i += 1LL)   {
+  for (auto i = ((num)0); i < n; i += ((num)1))   {
     rox_result<char> r = rox_at(items, i);
     if (isOk(r))     {
       char val = getValue(r);
@@ -93,17 +93,17 @@ bool contains(std::vector<char> items, char c) {
 }
 num length_of_longest_substring(std::vector<char> items) {
   num n = items.size();
-  num max_len = 0LL;
-  num left = 0LL;
-  for (auto k = 0LL; k < n; k += 1LL)   {
+  num max_len = ((num)0);
+  num left = ((num)0);
+  for (auto k = ((num)0); k < n; k += ((num)1))   {
     rox_result<char> r_k = rox_at(items, k);
     if ((isOk(r_k) == false))     {
-      return 0LL;
+      return ((num)0);
     }
     char c = getValue(r_k);
     bool found = false;
-    num found_index = 0LL;
-    for (auto j = left; j < k; j += 1LL)     {
+    num found_index = ((num)0);
+    for (auto j = left; j < k; j += ((num)1))     {
       rox_result<char> r_j = rox_at(items, j);
       if (isOk(r_j))       {
         char char_j = getValue(r_j);
@@ -115,10 +115,10 @@ num length_of_longest_substring(std::vector<char> items) {
     }
     if ((found == true))     {
       if ((found_index >= left))       {
-        (left = (found_index + 1LL));
+        (left = (found_index + ((num)1)));
       }
     }
-    num current_len = ((k - left) + 1LL);
+    num current_len = ((k - left) + ((num)1));
     if ((current_len > max_len))     {
       (max_len = current_len);
     }
@@ -127,11 +127,11 @@ num length_of_longest_substring(std::vector<char> items) {
 }
 int main() {
   std::vector<char> s1 = std::vector{'a', 'b', 'c', 'a', 'b', 'c', 'b', 'b'};
-  if ((length_of_longest_substring(s1) == 3LL))   {
+  if ((length_of_longest_substring(s1) == ((num)3)))   {
     std::vector<char> s2 = std::vector{'b', 'b', 'b', 'b', 'b'};
-    if ((length_of_longest_substring(s2) == 1LL))     {
+    if ((length_of_longest_substring(s2) == ((num)1)))     {
       std::vector<char> s3 = std::vector{'p', 'w', 'w', 'k', 'e', 'w'};
-      if ((length_of_longest_substring(s3) == 3LL))       {
+      if ((length_of_longest_substring(s3) == ((num)3)))       {
         print(std::vector{'L', 'o', 'n', 'g', 'e', 's', 't', ' ', 'S', 'u', 'b', 's', 't', 'r', 'i', 'n', 'g', ':', ' ', 'P', 'a', 's', 's', 'e', 'd', '\n'});
         return 0;
       }

@@ -80,41 +80,41 @@ num32 num32_abs(num32 x) { return std::abs(x); }
 
 num binary_search_recursive(std::vector<num32> nums, num32 target, num low, num high) {
   if ((low > high))   {
-    return (-1LL);
+    return (-((num)1));
   }
   num diff = (high - low);
-  rox_result<num> r_div = rox_div(diff, 2LL);
+  rox_result<num> r_div = rox_div(diff, ((num)2));
   if ((isOk(r_div) == false))   {
-    return (-1LL);
+    return (-((num)1));
   }
   num half = getValue(r_div);
   num mid = (low + half);
   rox_result<num32> r = rox_at(nums, mid);
   if ((isOk(r) == false))   {
-    return (-1LL);
+    return (-((num)1));
   }
   num32 midVal = getValue(r);
   if ((midVal == target))   {
     return mid;
   }
   else   if ((midVal < target))   {
-    return binary_search_recursive(nums, target, (mid + 1LL), high);
+    return binary_search_recursive(nums, target, (mid + ((num)1)), high);
   }
   else   {
-    return binary_search_recursive(nums, target, low, (mid - 1LL));
+    return binary_search_recursive(nums, target, low, (mid - ((num)1)));
   }
 }
 num search(std::vector<num32> nums, num32 target) {
   num n = nums.size();
-  if ((n == 0LL))   {
-    return (-1LL);
+  if ((n == ((num)0)))   {
+    return (-((num)1));
   }
-  return binary_search_recursive(nums, target, 0LL, (n - 1LL));
+  return binary_search_recursive(nums, target, ((num)0), (n - ((num)1)));
 }
 int main() {
   std::vector<num32> nums = std::vector{(-1), 0, 3, 5, 9, 12};
-  if ((search(nums, 9) == 4LL))   {
-    if ((search(nums, 2) == (-1LL)))     {
+  if ((search(nums, 9) == ((num)4)))   {
+    if ((search(nums, 2) == (-((num)1))))     {
       print(std::vector{'B', 'i', 'n', 'a', 'r', 'y', ' ', 'S', 'e', 'a', 'r', 'c', 'h', ':', ' ', 'P', 'a', 's', 's', 'e', 'd', '\n'});
       return 0;
     }

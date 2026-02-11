@@ -360,8 +360,10 @@ void Codegen::genLiteral(LiteralExpr* expr) {
             // Just output the number part
             out << s.substr(0, npos);
         } else {
-            // No suffix -> num64 -> append LL for C++
-            out << s << "LL";
+            // No suffix -> num64
+            // Cast to (num) to ensure std::vector deduction picks up vector<num>
+            // instead of vector<long long> (which might differ from num=int64_t=long on Mac)
+            out << "((num)" << s << ")";
         }
     } else {
         out << expr->value.lexeme;

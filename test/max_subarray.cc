@@ -80,13 +80,13 @@ num32 num32_abs(num32 x) { return std::abs(x); }
 
 num32 max_sub_array(std::vector<num32> nums) {
   num n = nums.size();
-  rox_result<num32> r0 = rox_at(nums, 0LL);
+  rox_result<num32> r0 = rox_at(nums, ((num)0));
   if ((isOk(r0) == false))   {
     return 0;
   }
   num32 max_so_far = getValue(r0);
   num32 current_max = max_so_far;
-  for (auto i = 1LL; i < n; i += 1LL)   {
+  for (auto i = ((num)1); i < n; i += ((num)1))   {
     rox_result<num32> r = rox_at(nums, i);
     if ((isOk(r) == false))     {
       return 0;

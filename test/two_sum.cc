@@ -80,16 +80,16 @@ num32 num32_abs(num32 x) { return std::abs(x); }
 
 std::vector<num> two_sum(std::vector<num32> nums, num32 target) {
   num n = nums.size();
-  for (auto i = 0LL; i < n; i += 1LL)   {
-    for (auto j = (i + 1LL); j < n; j += 1LL)     {
+  for (auto i = ((num)0); i < n; i += ((num)1))   {
+    for (auto j = (i + ((num)1)); j < n; j += ((num)1))     {
       rox_result<num32> r1 = rox_at(nums, i);
       if ((isOk(r1) == false))       {
-        return std::vector{(-1LL), (-1LL)};
+        return std::vector{(-((num)1)), (-((num)1))};
       }
       num32 v1 = getValue(r1);
       rox_result<num32> r2 = rox_at(nums, j);
       if ((isOk(r2) == false))       {
-        return std::vector{(-1LL), (-1LL)};
+        return std::vector{(-((num)1)), (-((num)1))};
       }
       num32 v2 = getValue(r2);
       if (((v1 + v2) == target))       {
@@ -97,17 +97,17 @@ std::vector<num> two_sum(std::vector<num32> nums, num32 target) {
       }
     }
   }
-  return std::vector{(-1LL), (-1LL)};
+  return std::vector{(-((num)1)), (-((num)1))};
 }
 int main() {
   std::vector<num32> nums = std::vector{2, 7, 11, 15};
   num32 target = 9;
   std::vector<num> result = two_sum(nums, target);
-  if ((result.size() == 2LL))   {
-    rox_result<num> r0 = rox_at(result, 0LL);
-    rox_result<num> r1 = rox_at(result, 1LL);
+  if ((result.size() == ((num)2)))   {
+    rox_result<num> r0 = rox_at(result, ((num)0));
+    rox_result<num> r1 = rox_at(result, ((num)1));
     if ((isOk(r0) && isOk(r1)))     {
-      if (((getValue(r0) == 0LL) && (getValue(r1) == 1LL)))       {
+      if (((getValue(r0) == ((num)0)) && (getValue(r1) == ((num)1))))       {
         print(std::vector{'T', 'w', 'o', ' ', 'S', 'u', 'm', ':', ' ', 'P', 'a', 's', 's', 'e', 'd', '\n'});
         return 0;
       }

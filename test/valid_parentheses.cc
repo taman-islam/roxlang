@@ -82,7 +82,7 @@ bool is_valid(std::vector<char> s) {
   std::vector<char> stack = std::vector{'a'};
   stack.pop_back();
   num n = s.size();
-  for (auto i = 0LL; i < n; i += 1LL)   {
+  for (auto i = ((num)0); i < n; i += ((num)1))   {
     rox_result<char> r = rox_at(s, i);
     if ((isOk(r) == false))     {
       return false;
@@ -98,10 +98,10 @@ bool is_valid(std::vector<char> s) {
       stack.push_back(c);
     }
     else     {
-      if ((stack.size() == 0LL))       {
+      if ((stack.size() == ((num)0)))       {
         return false;
       }
-      num last_idx = (stack.size() - 1LL);
+      num last_idx = (stack.size() - ((num)1));
       rox_result<char> rt = rox_at(stack, last_idx);
       if ((isOk(rt) == false))       {
         return false;
@@ -125,7 +125,7 @@ bool is_valid(std::vector<char> s) {
       }
     }
   }
-  return (stack.size() == 0LL);
+  return (stack.size() == ((num)0));
 }
 int main() {
   if ((is_valid(std::vector{'(', ')'}) == true))   {

@@ -65,7 +65,7 @@ void cmd_compile(const std::string& inputPath) {
 
     std::string binaryPath = ccPath.substr(0, ccPath.size() - 3); // Remove .cc
 
-    std::string cmd = "clang++ -std=c++20 -o " + binaryPath + " " + ccPath;
+    std::string cmd = "clang++ -w -std=c++20 -o " + binaryPath + " " + ccPath;
     int ret = system(cmd.c_str());
     if (ret != 0) {
         std::cerr << "Compilation failed." << std::endl;
