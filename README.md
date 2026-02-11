@@ -177,6 +177,18 @@ make
 
 ## Test Programs
 
+You can run all verified test programs with the provided script:
+
+```bash
+./test.sh
+```
+
+Alternatively, run them individually:
+
+```bash
+./rox run test/two_sum.rox
+```
+
 The `test/` directory contains verified implementations of:
 
 - Two Sum

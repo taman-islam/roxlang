@@ -11,6 +11,11 @@ function contains(items <list[char]>, c <char>) -> bool {
             if (val == c) {
                 return true;
             }
+        }
+    }
+    return false;
+}
+
 function length_of_longest_substring(items <list[char]>) -> num {
     let n <num> = items.size();
     let max_len <num> = 0;

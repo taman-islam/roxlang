@@ -106,14 +106,10 @@ int main() {
   if ((result.size() == 2LL))   {
     rox_result<num> r0 = rox_at(result, 0LL);
     rox_result<num> r1 = rox_at(result, 1LL);
-    if (isOk(r0))     {
-      if (isOk(r1))       {
-        if ((getValue(r0) == 0LL))         {
-          if ((getValue(r1) == 1LL))           {
-            print(std::vector{'T', 'w', 'o', ' ', 'S', 'u', 'm', ':', ' ', 'P', 'a', 's', 's', 'e', 'd', '\n'});
-            return 0;
-          }
-        }
+    if ((isOk(r0) && isOk(r1)))     {
+      if (((getValue(r0) == 0LL) && (getValue(r1) == 1LL)))       {
+        print(std::vector{'T', 'w', 'o', ' ', 'S', 'u', 'm', ':', ' ', 'P', 'a', 's', 's', 'e', 'd', '\n'});
+        return 0;
       }
     }
   }

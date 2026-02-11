@@ -37,16 +37,12 @@ function main() -> none {
         let r0 <rox_result[num]> = result.at(0);
         let r1 <rox_result[num]> = result.at(1);
 
-        if (isOk(r0)) {
-            if (isOk(r1)) {
-                 if (getValue(r0) == 0) {
-                     if (getValue(r1) == 1) {
-                         // print(['T', 'w', 'o', ' ', 'S', 'u', 'm', ':', ' ', 'P', 'a', 's', 's', 'e', 'd', ' ', '(', '[', '0', ',', ' ', '1', ']', ')', '\n']);
-                         // Concatenating is tedious.
-                         print(['T','w','o',' ','S','u','m',':',' ','P','a','s','s','e','d','\n']);
-                         return none;
-                     }
-                 }
+        if (isOk(r0) and isOk(r1)) {
+            if (getValue(r0) == 0 and getValue(r1) == 1) {
+                // print(['T', 'w', 'o', ' ', 'S', 'u', 'm', ':', ' ', 'P', 'a', 's', 's', 'e', 'd', ' ', '(', '[', '0', ',', ' ', '1', ']', ')', '\n']);
+                // Concatenating is tedious.
+                print(['T','w','o',' ','S','u','m',':',' ','P','a','s','s','e','d','\n']);
+                return none;
             }
         }
     }
