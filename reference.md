@@ -15,6 +15,24 @@ ROX removes implicit behavior, hidden conversions, and syntactic tricks so that 
 - Explicit control flow only
 - Strict compile-time type checking
 
+## Operators
+
+### Arithmetic
+
+- `+`, `-`, `*`, `/`, `%`
+
+### Comparison
+
+- `==`: Equal
+- `<`, `<=`, `>`, `>=`
+- Note: `!=` is **not** supported. Use `not (a == b)`.
+
+### Logical
+
+- `and`
+- `or`
+- `not`: Replaces `!`.
+
 ## Types
 
 ROX is a statically typed language. All types must be explicit.
