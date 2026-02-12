@@ -79,8 +79,10 @@ std::unique_ptr<Stmt> Parser::varDeclaration() {
 
     // Removed < > around type.
 
-    consume(TokenType::EQUAL, "Expect '=' after variable declaration.");
-    std::unique_ptr<Expr> initializer = expression();
+    std::unique_ptr<Expr> initializer = nullptr;
+    if (match({TokenType::EQUAL})) {
+         initializer = expression();
+    }
 
     consume(TokenType::SEMICOLON, "Expect ';' after variable declaration.");
 

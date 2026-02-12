@@ -43,12 +43,22 @@ void cmd_generate(const std::string& inputPath) {
     std::string source = readFile(inputPath);
     std::string cc = generate_cc(source);
 
-    std::string outputPath = inputPath + ".cc"; // Simple appending for v0
-    // Better: replace .rox with .cc
-    if (inputPath.size() > 4 && inputPath.substr(inputPath.size() - 4) == ".rox") {
-        outputPath = inputPath.substr(0, inputPath.size() - 4) + ".cc";
+    // Extract filename from input path (handle directories)
+    std::string filename = inputPath;
+    size_t lastSlash = inputPath.find_last_of('/');
+    if (lastSlash != std::string::npos) {
+        filename = inputPath.substr(lastSlash + 1);
     }
 
+    // Remove extension
+    if (filename.size() > 4 && filename.substr(filename.size() - 4) == ".rox") {
+        filename = filename.substr(0, filename.size() - 4);
+    }
+
+    // Ensure generated directory exists
+    system("mkdir -p generated");
+
+    std::string outputPath = "generated/" + filename + ".cc";
     writeFile(outputPath, cc);
     std::cout << "Generated " << outputPath << std::endl;
 }
@@ -56,14 +66,18 @@ void cmd_generate(const std::string& inputPath) {
 void cmd_compile(const std::string& inputPath) {
     cmd_generate(inputPath);
 
-    std::string ccPath = inputPath;
-    if (inputPath.size() > 4 && inputPath.substr(inputPath.size() - 4) == ".rox") {
-        ccPath = inputPath.substr(0, inputPath.size() - 4) + ".cc";
-    } else {
-        ccPath += ".cc";
+    // Reconstruct output path logic to parse the filename
+    std::string filename = inputPath;
+    size_t lastSlash = inputPath.find_last_of('/');
+    if (lastSlash != std::string::npos) {
+        filename = inputPath.substr(lastSlash + 1);
+    }
+     if (filename.size() > 4 && filename.substr(filename.size() - 4) == ".rox") {
+        filename = filename.substr(0, filename.size() - 4);
     }
 
-    std::string binaryPath = ccPath.substr(0, ccPath.size() - 3); // Remove .cc
+    std::string ccPath = "generated/" + filename + ".cc";
+    std::string binaryPath = "generated/" + filename;
 
     std::string cmd = "clang++ -w -std=c++20 -o " + binaryPath + " " + ccPath;
     int ret = system(cmd.c_str());
@@ -77,24 +91,24 @@ void cmd_compile(const std::string& inputPath) {
 void cmd_run(const std::string& inputPath) {
     cmd_compile(inputPath);
 
-    std::string ccPath = inputPath;
-    if (inputPath.size() > 4 && inputPath.substr(inputPath.size() - 4) == ".rox") {
-        ccPath = inputPath.substr(0, inputPath.size() - 4) + ".cc";
-    } else {
-        ccPath += ".cc";
+    // Logic to get binary path
+    std::string filename = inputPath;
+     size_t lastSlash = inputPath.find_last_of('/');
+    if (lastSlash != std::string::npos) {
+        filename = inputPath.substr(lastSlash + 1);
     }
-    std::string binaryPath = ccPath.substr(0, ccPath.size() - 3);
+     if (filename.size() > 4 && filename.substr(filename.size() - 4) == ".rox") {
+        filename = filename.substr(0, filename.size() - 4);
+    }
 
-    std::string cmd;
-    if (binaryPath.size() > 0 && binaryPath[0] == '/') {
-        cmd = binaryPath;
-    } else {
-        cmd = "./" + binaryPath;
-    }
+    std::string binaryPath = "generated/" + filename;
+
+    // Execute
+    std::string cmd = "./" + binaryPath;
     int ret = system(cmd.c_str());
     if (ret != 0) {
-        // Program failed or exit code != 0
-        exit(WEXITSTATUS(ret));
+         // Return exit code
+         exit(WEXITSTATUS(ret));
     }
 }
 

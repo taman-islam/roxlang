@@ -131,8 +131,31 @@ if (isOk(res)) {
       <li><code>.at(index) -> rox_result[T]</code>: Safely retrieves an item.</li>
     </ul>
 
-    <h2>Dictionaries <span class="wip-tag">Coming Soon</span></h2>
-    <p>Key-value maps are planned for future versions of ROX.</p>
+    <h2>Dictionaries</h2>
+    <p>A key-value map of elements of Type <code>K</code> and <code>V</code>.</p>
+
+    <h3>Declaration</h3>
+    <pre><code>dictionary[num, string] d;
+d.set(1, "one");
+
+dictionary[string, num] scores;
+scores.set("player1", 100);</code></pre>
+
+    <h3>Verification</h3>
+    <p>Access returns a <code>rox_result[V]</code> which must be checked.</p>
+    <pre><code>rox_result[string] res = d.at(1);
+if (isOk(res)) {
+    string val = getValue(res);
+}</code></pre>
+
+    <h3>Methods</h3>
+    <ul>
+      <li><code>.set(key, value) -> none</code>: Inserts or updates a key-value pair.</li>
+      <li><code>.remove(key) -> none</code>: Removes the key and its value.</li>
+      <li><code>.has(key) -> bool</code>: Checks if a key exists.</li>
+      <li><code>.size() -> num</code>: Returns the number of elements.</li>
+      <li><code>.at(key) -> rox_result[V]</code>: Safely retrieves a value.</li>
+    </ul>
   </div>
 </body>
 

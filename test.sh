@@ -36,6 +36,8 @@ run_test "test/binary_search.rox"
 run_test "test/max_subarray.rox"
 run_test "test/longest_substring.rox"
 run_test "test/test_string.rox"
+run_test "test/test_dict.rox"
+run_test "test/test_regression.rox"
 
 echo "--------------------------------"
 if [ $fail_count -eq 0 ]; then

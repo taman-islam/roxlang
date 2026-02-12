@@ -1,0 +1,49 @@
+function main() -> none {
+    // Dict creation (default init)
+    dictionary[num, string] d;
+
+    // Set
+    d.set(1, "one");
+    d.set(2, "two");
+
+    // Get
+    print(any_to_string(d.size())); // 2
+
+    rox_result[string] r1 = d.at(1);
+    if (isOk(r1)) {
+        print(getValue(r1)); // one
+    }
+
+    // Overwrite
+    d.set(1, "ONE");
+    rox_result[string] r2 = d.at(1);
+    if (isOk(r2)) {
+        print(getValue(r2)); // ONE
+    }
+
+    // Remove
+    d.remove(2);
+    print(any_to_string(d.size())); // 1
+
+    // Has
+    if (d.has(1)) {
+        print("Has 1");
+    }
+    if (not d.has(2)) {
+        print("No 2");
+    }
+
+    // Error handling
+    rox_result[string] r3 = d.at(99);
+    if (not isOk(r3)) {
+        print("Key not found");
+    }
+
+    // String keys
+    dictionary[string, num] ds;
+    ds.set("a", 100);
+    rox_result[num] rs = ds.at("a");
+    if (isOk(rs)) {
+        print(numToString(getValue(rs))); // 100
+    }
+}

@@ -159,6 +159,42 @@ void Codegen::emitPreamble() {
     out << "    return ok(a % b);\n";
     out << "}\n";
     out << "\n";
+    out << "// Dictionary Hash for RoxString\n";
+    out << "namespace std {\n";
+    out << "    template <> struct hash<RoxString> {\n";
+    out << "        size_t operator()(const RoxString& s) const {\n";
+    out << "            return hash<string>()(s.val);\n";
+    out << "        }\n";
+    out << "    };\n";
+    out << "}\n";
+    out << "\n";
+    out << "// Dictionary Access\n";
+    out << "template<typename K, typename V>\n";
+    out << "rox_result<V> rox_at(const std::unordered_map<K, V>& dict, K key) {\n";
+    out << "    auto it = dict.find(key);\n";
+    out << "    if (it == dict.end()) return error<V>(2); // key_not_found\n";
+    out << "    return ok(it->second);\n";
+    out << "}\n";
+    out << "\n";
+    out << "// Dictionary Set\n";
+    out << "template<typename K, typename V>\n";
+    out << "void rox_set(std::unordered_map<K, V>& dict, K key, V val) {\n";
+    out << "    dict.insert_or_assign(key, val);\n";
+    out << "}\n";
+    out << "\n";
+    out << "// Dictionary Remove\n";
+    out << "template<typename K, typename V>\n";
+    out << "void rox_remove(std::unordered_map<K, V>& dict, K key) {\n";
+    out << "    dict.erase(key);\n";
+    out << "}\n";
+    out << "\n";
+    out << "// Dictionary Has\n";
+    out << "template<typename K, typename V>\n";
+    out << "bool rox_has(const std::unordered_map<K, V>& dict, K key) {\n";
+    out << "    return dict.find(key) != dict.end();\n";
+    out << "}\n";
+    out << "\n";
+    out << "\n";
 
     out << "num32 num32_abs(num32 x) { return std::abs(x); }\n";
     out << "num32 num32_min(num32 x, num32 y) { return std::min(x, y); }\n";
@@ -404,7 +440,16 @@ void Codegen::genLet(LetStmt* stmt) {
     emitIndent();
     if (stmt->isConst) out << "const ";
     genType(stmt->type.get());
-    out << " " << stmt->name.lexeme << " = ";
+    out << " " << stmt->name.lexeme;
+
+    if (!stmt->initializer) {
+        // No initializer -> default initialization
+        out << "{};";
+        out << "\n";
+        return;
+    }
+
+    out << " = ";
 
     // Optimized handling for ListLiteralExpr to ensure std::vector<T> is explicitly constructed
     // This fixes issues with empty lists [] where std::vector{} (CTAD) fails.
@@ -530,6 +575,31 @@ void Codegen::genMethodCall(MethodCallExpr* expr) {
     } else if (method == "pop") {
         genExpr(expr->object.get());
         out << ".pop_back()";
+    } else if (method == "set") {
+        out << "rox_set(";
+        genExpr(expr->object.get());
+        out << ", ";
+        genExpr(expr->arguments[0].get());
+        out << ", ";
+        genExpr(expr->arguments[1].get());
+        out << ")";
+    } else if (method == "remove") {
+        out << "rox_remove(";
+        genExpr(expr->object.get());
+        out << ", ";
+        genExpr(expr->arguments[0].get());
+        out << ")";
+    } else if (method == "has") {
+        out << "rox_has(";
+        genExpr(expr->object.get());
+        out << ", ";
+        genExpr(expr->arguments[0].get());
+        out << ")";
+    } else if (method == "size") {
+        // cast to num for strict typing
+        out << "((num)";
+        genExpr(expr->object.get());
+        out << ".size())";
     } else {
         genExpr(expr->object.get());
         out << "." << method << "(";

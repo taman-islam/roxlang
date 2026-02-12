@@ -1,0 +1,13 @@
+function main() -> none {
+    // Test standard declaration with assignment
+    num x = 10;
+    print(any_to_string(x));
+
+    // Test num32
+    num32 y = 20;
+    print(any_to_string(y));
+
+    // Test string
+    string s = "hello";
+    print(s);
+}
