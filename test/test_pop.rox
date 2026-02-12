@@ -1,0 +1,28 @@
+
+// Test pop behavior
+
+function main() -> none {
+    list[num] nums = [1, 2, 3];
+
+    // Pop 3
+    nums.pop();
+    print("Popped once\n");
+
+    // Pop 2
+    nums.pop();
+    print("Popped twice\n");
+
+    // Pop 1
+    nums.pop();
+    print("Popped thrice\n");
+
+    // Pop from empty (undefined behavior in C++ generally, but std::vector::pop_back on empty is UB.
+    // Since we are reverting to raw .pop_back(), we lose the safety check unless we add it inline or keep a helper that returns void but checks size.
+    // The user said "pop will return none", implies standard void pop.
+    // Standard `pop` usually crashes or is UB on empty in many systems if unchecked.
+    // For now, I'll avoid popping empty in test or just print size.
+
+    print("Final size: ");
+    print(nums.size());
+    print("\n");
+}

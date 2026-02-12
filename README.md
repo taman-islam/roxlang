@@ -99,13 +99,14 @@ The language forces clarity — not ceremony.
 
 ### Types
 
-- `num` (int64)
-- `num32` (int32)
+- `num` (64 bit signed integer)
+- `num32` (32 bit signed integer)
 - `bool`
 - `char`
 - `string`
 - `none`
 - `list[T]`
+- `dictionary[K, V]`
 - `rox_result[T]`
 
 ### Control Flow
@@ -115,8 +116,7 @@ The language forces clarity — not ceremony.
 
 ### Built-in Functions
 
-- `print(list[char]) -> none`
-- `print(string) -> none`
+- `print(val) -> none` (supports string, num, float, bool, char, list)
 - `isOk(rox_result[T]) -> bool`
 - `getValue(rox_result[T]) -> T`
 
@@ -180,6 +180,27 @@ print(s);
 print("\n");
 ```
 
+## Dictionaries
+
+Hash maps for key-value storage.
+
+```rox
+dictionary[string, num] scores;
+scores.set("Alice", 100);
+if (scores.has("Alice")) {
+    print(scores.get("Alice"));
+}
+```
+
+## Comments
+
+Comments are single-line and start with `//`.
+
+```rox
+// This is a comment
+num x = 10; // This is also a comment
+```
+
 ## Compilation Model
 
 ROX is compiled, not interpreted.
@@ -209,6 +230,12 @@ make
 
 ```bash
 ./rox run test/two_sum.rox
+```
+
+### Format Code
+
+```bash
+./rox format test/two_sum.rox
 ```
 
 ### Generate C++ Only
@@ -257,12 +284,11 @@ ROX v0 focuses on:
 - Clean C++ code generation
 - Minimal language surface
 
-Future directions may include:
+Future directions (ROX++) may include:
 
 - Module system
 - Expanded standard library
 - Static analysis improvements
-- Web-based playground
 
 ## Philosophy Summary
 

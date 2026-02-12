@@ -112,11 +112,15 @@
     <h2>Loops</h2>
     <h3>repeat</h3>
     <p>ROX has a single loop construct: <code>repeat</code>. It iterates over a range of numbers.</p>
-    <p>Syntax: <code>repeat var in range(start, end, step)</code></p>
+    <p>Syntax:</p>
+    <ul>
+      <li><code>repeat var in range(start, end)</code> (step defaults to 1)</li>
+      <li><code>repeat var in range(start, end, step)</code></li>
+    </ul>
     <ul>
       <li><code>start</code>: Inclusive</li>
       <li><code>end</code>: Exclusive (stop before this value)</li>
-      <li><code>step</code>: Increment amount</li>
+      <li><code>step</code>: Increment amount (optional)</li>
     </ul>
     <pre><code>// Print 0 to 4
 repeat i in range(0, 5, 1) {

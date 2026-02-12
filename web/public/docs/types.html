@@ -145,6 +145,18 @@ print(s); // Prints "Hello"</code></pre>
     return none;
 }</code></pre>
 
+    <h2>Composite Types</h2>
+    <h3>list[T] <span class="type-tag">Dynamic Array</span></h3>
+    <p>Ordered collection of elements of type <code>T</code>.</p>
+    <pre><code>list[num] numbers = [1, 2, 3];
+num first = getValue(numbers.at(0));</code></pre>
+
+    <h3>dictionary[K, V] <span class="type-tag">Hash Map</span></h3>
+    <p>Key-value pairs. Keys must be comparable (num, string, bool, char).</p>
+    <pre><code>dictionary[string, num] scores;
+scores.set("Alice", 100);
+num score = getValue(scores.get("Alice"));</code></pre>
+
     <h2>Result Type</h2>
     <h3>rox_result[T]</h3>
     <p>ROX does not use exceptions. Operations that can fail return a <code>rox_result[T]</code>.</p>
