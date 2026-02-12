@@ -47,6 +47,7 @@ run_test "test/valid_parentheses.rox"
 run_test "test/test_list_set.rox"
 run_test "test/test_break.rox"
 run_test "test/test_continue.rox"
+run_test "test/test_result_error.rox"
 run_test "test/test_format_not.rox"
 
 

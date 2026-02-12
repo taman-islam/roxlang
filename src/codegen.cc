@@ -52,48 +52,8 @@ void Codegen::emitPreamble() {
 
     out << "struct None { bool operator==(const None&) const { return true; } };\n";
     out << "const None none = {};\n";
-
-    // Result type
-    out << "template<typename T>\n";
-    out << "struct rox_result {\n";
-    out << "    T value;\n";
-    out << "    num32 err;\n";
-    out << "};\n";
-
-    // Runtime Helpers
-    out << "template<typename T>\n";
-    out << "bool isOk(rox_result<T> r) {\n";
-    out << "    return r.err == 0;\n";
-    out << "}\n";
-
-    out << "template<typename T>\n";
-    out << "T getValue(rox_result<T> r) {\n";
-    out << "    if (r.err != 0) {\n";
-    out << "        std::cerr << \"Called getValue on runtime error result!\" << std::endl;\n";
-    out << "        exit(r.err);\n";
-    out << "    }\n";
-    out << "    return r.value;\n";
-    out << "}\n";
-
-
-    out << "void print_loop(num32 n) {\n";
-    out << "    for (int i = 0; i < n; ++i) {\n";
-    out << "        std::cout << \"Hello, World!\" << std::endl;\n";
-    out << "    }\n";
-    out << "}\n";
-
-    out << "// Result constructors\n";
-    out << "template<typename T>\n";
-    out << "rox_result<T> ok(T value) { return {value, 0}; }\n";
-    out << "template<typename T>\n";
-    out << "rox_result<T> error(num32 code) { return {T{}, code}; }\n";
-
-
-    // Built-in constants
-    out << "const double pi = 3.141592653589793;\n";
-    out << "const double e  = 2.718281828459045;\n";
-
-    // Helper for string literals
+    out << "\n";
+    out << "    // Helper for string literals\n";
     out << "class RoxString {\n";
     out << "public:\n";
     out << "    std::string val;\n";
@@ -113,7 +73,50 @@ void Codegen::emitPreamble() {
     out << "RoxString rox_str(const char* s) {\n";
     out << "    return RoxString(s);\n";
     out << "}\n";
-    out << "\n";
+
+    // Result type
+    out << "template<typename T>\n";
+    out << "struct rox_result {\n";
+    out << "    T value;\n";
+    out << "    RoxString err;\n";
+    out << "};\n";
+
+    // Runtime Helpers
+    out << "template<typename T>\n";
+    out << "bool isOk(rox_result<T> r) {\n";
+    out << "    return r.err.val.empty();\n";
+    out << "}\n";
+
+    out << "template<typename T>\n";
+    out << "T getValue(rox_result<T> r) {\n";
+    out << "    if (!r.err.val.empty()) {\n";
+    out << "        std::cerr << \"Runtime Error: \" << r.err.val << std::endl;\n";
+    out << "        exit(1);\n";
+    out << "    }\n";
+    out << "    return r.value;\n";
+    out << "}\n";
+
+    out << "template<typename T>\n";
+    out << "RoxString getError(rox_result<T> r) {\n";
+    out << "    return r.err;\n";
+    out << "}\n";
+
+    out << "void print_loop(num32 n) {\n";
+    out << "    for (int i = 0; i < n; ++i) {\n";
+    out << "        std::cout << \"Hello, World!\" << std::endl;\n";
+    out << "    }\n";
+    out << "}\n";
+
+    out << "// Result constructors\n";
+    out << "template<typename T>\n";
+    out << "rox_result<T> ok(T value) { return {value, RoxString(\"\")}; }\n";
+    out << "template<typename T>\n";
+    out << "rox_result<T> error(const char* msg) { return {T{}, RoxString(msg)}; }\n";
+
+
+    // Built-in constants
+    out << "const double pi = 3.141592653589793;\n";
+    out << "const double e  = 2.718281828459045;\n";    out << "\n";
     out << "// I/O\n";
     out << "std::ostream& operator<<(std::ostream& os, const std::vector<char>& s) {\n";
     out << "    for (char c : s) os << c;\n";
@@ -130,7 +133,7 @@ void Codegen::emitPreamble() {
     out << "// List access\n";
     out << "template<typename T>\n";
     out << "rox_result<T> rox_at(const std::vector<T>& xs, num i) {\n";
-    out << "    if (i < 0 || i >= (num)xs.size()) return error<T>(1); // index_out_of_range\n";
+    out << "    if (i < 0 || i >= (num)xs.size()) return error<T>(\"Index out of bounds\");\n";
     out << "    return ok(xs[i]);\n";
     out << "}\n";
     out << "\n";
@@ -146,7 +149,7 @@ void Codegen::emitPreamble() {
     out << "\n";
     out << "// String access\n";
     out << "rox_result<char> rox_at(const RoxString& s, num i) {\n";
-    out << "    if (i < 0 || i >= s.size()) return error<char>(1);\n";
+    out << "    if (i < 0 || i >= s.size()) return error<char>(\"Index out of bounds\");\n";
     out << "    return ok(s.val[i]);\n";
     out << "}\n";
     out << "\n";
@@ -155,14 +158,14 @@ void Codegen::emitPreamble() {
     out << "// Division\n";
     out << "template<typename T>\n";
     out << "rox_result<T> rox_div(T a, T b) {\n";
-    out << "    if (b == 0) return error<T>(3); // division_by_zero\n";
+    out << "    if (b == 0) return error<T>(\"Division by zero\");\n";
     out << "    return ok(a / b);\n";
     out << "}\n";
     out << "\n";
     out << "// Modulo\n";
     out << "template<typename T>\n";
     out << "rox_result<T> rox_mod(T a, T b) {\n";
-    out << "    if (b == 0) return error<T>(3); // division_by_zero\n";
+    out << "    if (b == 0) return error<T>(\"Division by zero\");\n";
     out << "    return ok(a % b);\n";
     out << "}\n";
     out << "\n";
@@ -179,7 +182,7 @@ void Codegen::emitPreamble() {
     out << "template<typename K, typename V>\n";
     out << "rox_result<V> rox_get(const std::unordered_map<K, V>& dict, K key) {\n";
     out << "    auto it = dict.find(key);\n";
-    out << "    if (it == dict.end()) return error<V>(2); // key_not_found\n";
+    out << "    if (it == dict.end()) return error<V>(\"Key not found\");\n";
     out << "    return ok(it->second);\n";
     out << "}\n";
     out << "\n";
@@ -217,7 +220,7 @@ void Codegen::emitPreamble() {
     out << "num32 num32_min(num32 x, num32 y) { return std::min(x, y); }\n";
     out << "num32 num32_max(num32 x, num32 y) { return std::max(x, y); }\n";
     out << "rox_result<num32> num32_pow(num32 base, num32 exp) {\n";
-    out << "    if (exp < 0) return error<num32>(10); // invalid_argument\n";
+    out << "    if (exp < 0) return error<num32>(\"Negative exponent\");\n";
     out << "    num32 res = 1;\n";
     out << "    for (int i = 0; i < exp; ++i) res *= base;\n";
     out << "    return ok(res);\n";
@@ -227,7 +230,7 @@ void Codegen::emitPreamble() {
     out << "num num_min(num x, num y) { return std::min(x, y); }\n";
     out << "num num_max(num x, num y) { return std::max(x, y); }\n";
     out << "rox_result<num> num_pow(num base, num exp) {\n";
-    out << "    if (exp < 0) return error<num>(10); // invalid_argument\n";
+    out << "    if (exp < 0) return error<num>(\"Negative exponent\");\n";
     out << "    num res = 1;\n";
     out << "    for (int i = 0; i < exp; ++i) res *= base;\n";
     out << "    return ok(res);\n";
@@ -238,14 +241,14 @@ void Codegen::emitPreamble() {
     out << "double float_max(double x, double y) { return std::max(x, y); }\n";
     out << "double float_pow(double x, double y) { return std::pow(x, y); }\n";
     out << "rox_result<double> float_sqrt(double x) {\n";
-    out << "    if (x < 0) return error<double>(10); // invalid_argument\n";
+    out << "    if (x < 0) return error<double>(\"Negative input for sqrt\");\n";
     out << "    return ok(std::sqrt(x));\n";
     out << "}\n";
     out << "double float_sin(double x) { return std::sin(x); }\n";
     out << "double float_cos(double x) { return std::cos(x); }\n";
     out << "double float_tan(double x) { return std::tan(x); }\n";
     out << "rox_result<double> float_log(double x) {\n";
-    out << "    if (x <= 0) return error<double>(10); // invalid_argument\n";
+    out << "    if (x <= 0) return error<double>(\"Non-positive input for log\");\n";
     out << "    return ok(std::log(x));\n";
     out << "}\n";
     out << "double float_exp(double x) { return std::exp(x); }\n";

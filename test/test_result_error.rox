@@ -1,0 +1,19 @@
+function main() -> none {
+    list[num] l;
+    l.append(1);
+
+    // Out of bounds access returns error result
+    rox_result[num] res = l.at(5);
+
+    if (isOk(res)) {
+        print("Error: Expected error result\n");
+    } else {
+        string err = getError(res);
+        print("Got error: ", err, "\n");
+        if (err == "Index out of bounds") {
+             print("Error message verified\n");
+        } else {
+             print("Unexpected error message: ", err, "\n");
+        }
+    }
+}

@@ -133,6 +133,25 @@ repeat i in range(10, 0, -1) {
     // i is 10, 9, ... 1
 }</code></pre>
 
+    <h2>Loop Control</h2>
+    <h3>break</h3>
+    <p>Terminates the nearest enclosing loop immediately.</p>
+    <pre><code>repeat i in range(0, 10) {
+    if (i == 5) {
+        break; // Stop at 5
+    }
+    print(i);
+}</code></pre>
+
+    <h3>continue</h3>
+    <p>Skips the rest of the current iteration and proceeds to the next one.</p>
+    <pre><code>repeat i in range(0, 5) {
+    if (i % 2 == 0) {
+        continue; // Skip even numbers
+    }
+    print(i);
+}</code></pre>
+
   </div>
 </body>
 
