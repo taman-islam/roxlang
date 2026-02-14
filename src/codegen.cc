@@ -43,6 +43,7 @@ void Codegen::emitPreamble() {
     out << "#include <numeric>\n";
     out << "#include <variant>\n"; // For possible future use or result
     out << "#include <cstdint>\n";
+    out << "#include <functional>\n"; // For std::function literals
 
     out << "\n// ROX Runtime\n";
     out << "using num32 = int32_t;\n";
