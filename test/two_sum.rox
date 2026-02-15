@@ -10,15 +10,22 @@ function two_sum(list[num32] nums, num32 target) -> list[num] {
 
             // Handle result explicitly
             rox_result[num32] r1 = nums.at(i);
-            if (not isOk(r1)) { return [-1, -1]; }
-            num32 v1 = getValue(r1);
 
-            rox_result[num32] r2 = nums.at(j);
-            if (not isOk(r2)) { return [-1, -1]; }
-            num32 v2 = getValue(r2);
+            if (isOk(r1)) {
+                num32 v1 = getValue(r1);
 
-            if (v1 + v2 == target) {
-                return [i, j];
+                rox_result[num32] r2 = nums.at(j);
+                if (isOk(r2)) {
+                    num32 v2 = getValue(r2);
+
+                    if (v1 + v2 == target) {
+                        return [i, j];
+                    }
+                } else {
+                    return [-1, -1];
+                }
+            } else {
+                return [-1, -1];
             }
         }
     }
@@ -37,10 +44,12 @@ function main() -> none {
         rox_result[num] r0 = result.at(0);
         rox_result[num] r1 = result.at(1);
 
-        if (isOk(r0) and isOk(r1)) {
-            if (getValue(r0) == 0 and getValue(r1) == 1) {
-                print("Two Sum: Passed\n");
-                return none;
+        if (isOk(r0)) {
+            if (isOk(r1)) {
+                if (getValue(r0) == 0 and getValue(r1) == 1) {
+                    print("Two Sum: Passed\n");
+                    return none;
+                }
             }
         }
     }

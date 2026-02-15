@@ -9,31 +9,38 @@ function is_valid(list[char] s) -> bool {
     repeat i in range(0, n, 1) {
         rox_result[char] r = s.at(i);
         // If error, return false (invalid state)
-        if (not isOk(r)) { return false; }
-        char c = getValue(r);
+        if (isOk(r)) {
+            char c = getValue(r);
 
-        if (c == '(' or c == '{' or c == '[') {
-            stack.append(c);
+            if (c == '(' or c == '{' or c == '[') {
+                stack.append(c);
+            } else {
+                // Closing bracket
+                if (stack.size() == 0) {
+                    return false;
+                }
+
+                num last_idx = stack.size() - 1;
+                rox_result[char] rt = stack.at(last_idx);
+
+                if (isOk(rt)) {
+                    char top = getValue(rt);
+
+                    stack.pop();
+
+                    if (c == ')') {
+                        if (not (top == '(')) { return false; }
+                    } else if (c == '}') {
+                        if (not (top == '{')) { return false; }
+                    } else if (c == ']') {
+                        if (not (top == '[')) { return false; }
+                    }
+                } else {
+                    return false;
+                }
+            }
         } else {
-            // Closing bracket
-            if (stack.size() == 0) {
-                return false;
-            }
-
-            num last_idx = stack.size() - 1;
-            rox_result[char] rt = stack.at(last_idx);
-            if (not isOk(rt)) { return false; }
-            char top = getValue(rt);
-
-            stack.pop();
-
-            if (c == ')') {
-                if (not (top == '(')) { return false; }
-            } else if (c == '}') {
-                if (not (top == '{')) { return false; }
-            } else if (c == ']') {
-                if (not (top == '[')) { return false; }
-            }
+            return false;
         }
     }
 

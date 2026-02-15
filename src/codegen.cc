@@ -10,7 +10,53 @@ namespace rox {
 // is_ok, get_value, and print functions moved to emitPreamble
 
 
-Codegen::Codegen(const std::vector<std::unique_ptr<Stmt>>& statements) : statements(statements) {}
+Codegen::Codegen(const std::vector<std::unique_ptr<Stmt>>& statements) : statements(statements) {
+    enterScope();
+}
+
+void Codegen::enterScope() {
+    scopes.push_back({});
+}
+
+void Codegen::exitScope() {
+    if (scopes.empty()) {
+        std::cerr << "Internal Compiler Error: Unbalanced scope exit." << std::endl;
+        exit(1);
+    }
+    scopes.pop_back();
+}
+
+void Codegen::declareVar(const std::string& name, Type* type) {
+    if (scopes.empty()) {
+        std::cerr << "Internal Compiler Error: declaration outside scope." << std::endl;
+        exit(1);
+    }
+    scopes.back()[name] = {type, false};
+}
+
+auto Codegen::resolveVar(const std::string& name) -> VarInfo* {
+    for (auto it = scopes.rbegin(); it != scopes.rend(); ++it) {
+        auto vit = it->find(name);
+        if (vit != it->end()) {
+            return &vit->second;
+        }
+    }
+    return nullptr;
+}
+
+void Codegen::refineVar(const std::string& name) {
+    VarInfo* info = resolveVar(name);
+    if (info) {
+        info->isProvenOk = true;
+    }
+}
+
+void Codegen::invalidateVar(const std::string& name) {
+    VarInfo* info = resolveVar(name);
+    if (info) {
+        info->isProvenOk = false;
+    }
+}
 
 std::string Codegen::generate() {
     emitPreamble();
@@ -265,6 +311,9 @@ void Codegen::emitPreamble() {
 }
 
 void Codegen::genStmt(Stmt* stmt) {
+    if (!stmt) {
+        return;
+    }
     if (auto* s = dynamic_cast<BlockStmt*>(stmt)) genBlock(s);
     else if (auto* s = dynamic_cast<IfStmt*>(stmt)) genIf(s);
     else if (auto* s = dynamic_cast<RepeatStmt*>(stmt)) genRepeat(s);
@@ -348,15 +397,41 @@ void Codegen::genBlock(BlockStmt* stmt) {
 }
 
 void Codegen::genIf(IfStmt* stmt) {
+    // Check if condition is 'isOk(var)'
+    // If so, refine var in then branch
+    std::string refinedVarName = "";
+    if (auto* call = dynamic_cast<CallExpr*>(stmt->condition.get())) {
+        if (auto* var = dynamic_cast<VariableExpr*>(call->callee.get())) {
+             if (var->name.lexeme == "isOk" && call->arguments.size() == 1) {
+                 if (auto* arg = dynamic_cast<VariableExpr*>(call->arguments[0].get())) {
+                     refinedVarName = arg->name.lexeme;
+                 }
+             }
+        }
+    }
+
     emitIndent();
     out << "if (";
     genExpr(stmt->condition.get());
     out << ") ";
+
+    // Enter scope for then branch to refine var
+    enterScope();
+    if (!refinedVarName.empty()) {
+        VarInfo* outer = resolveVar(refinedVarName);
+        if (outer) {
+            scopes.back()[refinedVarName] = {outer->type, true};
+        }
+    }
+
     genStmt(stmt->thenBranch.get());
+    exitScope();
+
     if (stmt->elseBranch) {
         emitIndent();
         out << "else ";
         genStmt(stmt->elseBranch.get());
+        // No refinement in else
     }
 }
 
@@ -468,6 +543,8 @@ void Codegen::genLet(LetStmt* stmt) {
     genType(stmt->type.get());
     out << " " << sanitize(stmt->name.lexeme);
 
+    declareVar(stmt->name.lexeme, stmt->type.get());
+
     if (!stmt->initializer) {
         // No initializer -> default initialization
         out << "{};";
@@ -566,12 +643,30 @@ void Codegen::genVariable(VariableExpr* expr) {
 }
 
 void Codegen::genAssignment(AssignmentExpr* expr) {
+    invalidateVar(expr->name.lexeme);
     out << "(" << sanitize(expr->name.lexeme) << " = ";
     genExpr(expr->value.get());
     out << ")";
 }
 
 void Codegen::genCall(CallExpr* expr) {
+    // Check for unsafe getValue(var)
+    if (auto* var = dynamic_cast<VariableExpr*>(expr->callee.get())) {
+        if (var->name.lexeme == "getValue" && expr->arguments.size() == 1) {
+            if (auto* arg = dynamic_cast<VariableExpr*>(expr->arguments[0].get())) {
+                VarInfo* info = resolveVar(arg->name.lexeme);
+                if (info && !info->isProvenOk) {
+                    std::cerr << "Compile Error: getValue(" << arg->name.lexeme
+                              << ") is unsafe. Variable '" << arg->name.lexeme
+                              << "' is not proven to be Ok in this scope. "
+                              << "Wrap it in 'if (isOk(" << arg->name.lexeme << ")) { ... }'."
+                              << std::endl;
+                    exit(1);
+                }
+            }
+        }
+    }
+
     genExpr(expr->callee.get());
     out << "(";
     for (size_t i = 0; i < expr->arguments.size(); ++i) {
@@ -589,6 +684,25 @@ void Codegen::genMethodCall(MethodCallExpr* expr) {
         out << ", ";
         if (!expr->arguments.empty()) genExpr(expr->arguments[0].get());
         out << ")";
+    } else if (method == "getValue") {
+       // Method syntax: x.getValue()
+       // Not standard built-in function 'getValue(x)', but maybe supported via method call syntax if added?
+       // The example code uses function call 'getValue(x)'.
+       // However, if the user tries x.getValue(), we should check too if supported.
+       // Current language spec says 'getValue(rox_result)'.
+       // But if we support method syntax for it in future:
+       if (auto* var = dynamic_cast<VariableExpr*>(expr->object.get())) {
+            VarInfo* info = resolveVar(var->name.lexeme);
+            if (info && !info->isProvenOk) {
+                 std::cerr << "Compile Error: " << var->name.lexeme << ".getValue() is unsafe. "
+                           << "Variable '" << var->name.lexeme << "' is not proven to be Ok in this scope."
+                           << std::endl;
+                 exit(1);
+            }
+       }
+       out << "getValue(";
+       genExpr(expr->object.get());
+       out << ")";
     } else if (method == "get") {
         out << "rox_get(";
         genExpr(expr->object.get());

@@ -24,32 +24,36 @@ function length_of_longest_substring(list[char] items) -> num {
 
     repeat k in range(0, n, 1) {
        rox_result[char] r_k = items.at(k);
-       if (not isOk(r_k)) { return 0; }
-       char c = getValue(r_k);
 
-       bool found = false;
-       num found_index = 0;
+       if (isOk(r_k)) {
+           char c = getValue(r_k);
 
-       repeat j in range(left, k, 1) {
-           rox_result[char] r_j = items.at(j);
-           if (isOk(r_j)) {
-                char char_j = getValue(r_j);
-                if (char_j == c) {
-                    found = true;
-                    found_index = j;
-                }
+           bool found = false;
+           num found_index = 0;
+
+           repeat j in range(left, k, 1) {
+               rox_result[char] r_j = items.at(j);
+               if (isOk(r_j)) {
+                    char char_j = getValue(r_j);
+                    if (char_j == c) {
+                        found = true;
+                        found_index = j;
+                    }
+               }
            }
-       }
 
-       if (found) {
-           if (found_index >= left) {
-               left = found_index + 1;
+           if (found) {
+               if (found_index >= left) {
+                   left = found_index + 1;
+               }
            }
-       }
 
-       num current_len = k - left + 1;
-       if (current_len > max_len) {
-           max_len = current_len;
+           num current_len = k - left + 1;
+           if (current_len > max_len) {
+               max_len = current_len;
+           }
+       } else {
+           return 0;
        }
     }
 

@@ -2,14 +2,15 @@ function main() -> none {
     list[num] lst;
     repeat i in range(0, 5) {
         rox_result[num] g = i%2;
-        if(not isOk(g)) {
+        if(isOk(g)) {
+            if(getValue(g) == 0) {
+                continue;
+            }
+            lst.append(i);
+        } else {
             print("Error: Failed to calculate modulo for ", i , "/2 \n");
             return;
         }
-        if(getValue(g) == 0) {
-            continue;
-        }
-        lst.append(i);
     }
     if (not (lst.size() == 2)) {
         print("Error: Expected size 2, got ", lst.size(), "\n");
@@ -17,12 +18,13 @@ function main() -> none {
     }
     repeat i in range(0, lst.size()) {
         rox_result[num] got = lst.at(i);
-        if(not isOk(got)) {
+        if(isOk(got)) {
+            if (not (getValue(got) == (i*2+1))) {
+                print("Error: Expected ", (i*2+1), ", got ", getValue(got), "\n");
+                return;
+            }
+        } else {
             print("failed to get item at index: ", i, "\n");
-            return;
-        }
-        if (not (getValue(got) == (i*2+1))) {
-            print("Error: Expected ", (i*2+1), ", got ", getValue(got), "\n");
             return;
         }
     }

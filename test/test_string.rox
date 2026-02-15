@@ -9,12 +9,14 @@ function main() -> none {
 
     // Check at
     rox_result[char] r = s.at(1);
-    if (not isOk(r)) {
+
+    if (isOk(r)) {
+         if (not (getValue(r) == 'e')) {
+             print("At Fail 2\n");
+             return none;
+         }
+    } else {
          print("At Fail 1\n");
-         return none;
-    }
-    if (not (getValue(r) == 'e')) {
-         print("At Fail 2\n");
          return none;
     }
 

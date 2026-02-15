@@ -2,30 +2,33 @@ function max_sub_array(list[num32] nums) -> num32 {
     num n = nums.size();
 
     rox_result[num32] r0 = nums.at(0);
-    if (not isOk(r0)) { return 0n32; }
+    if (isOk(r0)) {
+        num32 max_so_far = getValue(r0);
+        num32 current_max = max_so_far;
 
-    num32 max_so_far = getValue(r0);
-    num32 current_max = max_so_far;
+        repeat i in range(1, n, 1) {
+            rox_result[num32] r = nums.at(i); // i is num
+            if (isOk(r)) {
+                num32 x = getValue(r);
 
-    repeat i in range(1, n, 1) {
-        rox_result[num32] r = nums.at(i); // i is num
-        if (not isOk(r)) { return 0n32; }
-        num32 x = getValue(r);
+                // current_max = max(x, current_max + x)
+                num32 sum = current_max + x;
+                if (x > sum) {
+                     current_max = x;
+                } else {
+                     current_max = sum;
+                }
 
-        // current_max = max(x, current_max + x)
-        num32 sum = current_max + x;
-        if (x > sum) {
-             current_max = x;
-        } else {
-             current_max = sum;
+                if (current_max > max_so_far) {
+                    max_so_far = current_max;
+                }
+            } else {
+                return 0n32;
+            }
         }
-
-        if (current_max > max_so_far) {
-            max_so_far = current_max;
-        }
+        return max_so_far;
     }
-
-    return max_so_far;
+    return 0n32;
 }
 
 function main() -> none {

@@ -94,14 +94,18 @@ ROX is a statically typed language. All types must be explicit.
 ### Result Type
 
 - `rox_result[T]`: Explicit error handling type.
+
   ```rox
   rox_result[num] result = list.at(5);
   if (isOk(result)) {
+      // Safe to call getValue(result) here
       num val = getValue(result);
   } else {
       print("Error: ", getError(result), "\n");
   }
   ```
+
+  **Safety Note**: `getValue(result)` can _only_ be called within an `if (isOk(result))` block. The compiler currently enforces this via strict flow-sensitive analysis. Reassigning `result` invalidates this check. Future versions may include smarter checking to support more complex flow patterns.
 
 ## Control Flow
 

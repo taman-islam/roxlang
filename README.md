@@ -68,15 +68,17 @@ function two_sum(list[num] nums, num target) -> list[num] {
         repeat j in range(i + 1, n, 1) {
 
             rox_result[num] r1 = nums.at(i);
-            if (not isOk(r1)) { return [-1, -1]; }
-            num v1 = getValue(r1);
+            if (isOk(r1)) {
+                num v1 = getValue(r1);
 
-            rox_result[num] r2 = nums.at(j);
-            if (not isOk(r2)) { return [-1, -1]; }
-            num v2 = getValue(r2);
+                rox_result[num] r2 = nums.at(j);
+                if (isOk(r2)) {
+                    num v2 = getValue(r2);
 
-            if (v1 + v2 == target) {
-                return [i, j];
+                    if (v1 + v2 == target) {
+                        return [i, j];
+                    }
+                }
             }
         }
     }
@@ -165,10 +167,11 @@ ROX does not use exceptions. Errors are explicit values:
 
 ```rox
 rox_result[num] r = nums.at(i);
-if (not isOk(r)) {
+if (isOk(r)) {
+    num value = getValue(r);
+} else {
     return [-1, -1];
 }
-num value = getValue(r);
 ```
 
 To get the error message:

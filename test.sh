@@ -31,12 +31,25 @@ run_test() {
 
 test_fail() {
     file=$1
+    expected_error=$2
     echo -n "Testing expected fail $file... "
     output=$(./rox run "$file" 2>&1)
     exit_code=$?
 
     if [ $exit_code -ne 0 ]; then
-        echo -e "${GREEN}PASSED (Failed as expected)${NC}"
+        if [ -n "$expected_error" ]; then
+            if echo "$output" | grep -q "$expected_error"; then
+                echo -e "${GREEN}PASSED (Failed as expected with correct error)${NC}"
+            else
+                echo -e "${RED}FAILED (Failed but with wrong error)${NC}"
+                echo "Expected error containing: $expected_error"
+                echo "Actual output:"
+                echo "$output"
+                fail_count=$((fail_count + 1))
+            fi
+        else
+            echo -e "${GREEN}PASSED (Failed as expected)${NC}"
+        fi
     else
         echo -e "${RED}FAILED (Should have failed but passed)${NC}"
         echo "$output"
@@ -70,7 +83,8 @@ run_test "test/valid_parentheses.rox"
 # run tests that should fail
 test_fail "test/test_roxv26_prefix.rox"
 test_fail "test/test_string_fail.rox"
-
+test_fail "test/test_flow_invalid_1.rox" "getValue(res) is unsafe"
+test_fail "test/test_flow_invalid_2.rox" "getValue(res) is unsafe"
 
 
 echo "--------------------------------"

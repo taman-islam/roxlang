@@ -20,6 +20,21 @@ private:
     int indentLevel = 0;
     std::string currentFunctionName = "";
 
+    struct VarInfo {
+        Type* type;
+        bool isProvenOk;
+    };
+
+    using Scope = std::unordered_map<std::string, VarInfo>;
+    std::vector<Scope> scopes;
+
+    void enterScope();
+    void exitScope();
+    void declareVar(const std::string& name, Type* type);
+    VarInfo* resolveVar(const std::string& name);
+    void refineVar(const std::string& name);
+    void invalidateVar(const std::string& name);
+
     void emitIndent();
     void emit(const std::string& s);
     void emitLine(const std::string& s);

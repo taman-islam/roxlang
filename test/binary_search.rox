@@ -9,22 +9,24 @@ function binary_search_recursive(list[num32] nums, num32 target, num low, num hi
 
     num diff = high - low;
     rox_result[num] r_div = diff / 2;
-    if (not isOk(r_div)) { return -1; }
-    num half = getValue(r_div);
+    if (isOk(r_div)) {
+        num half = getValue(r_div);
+        num mid = low + half;
 
-    num mid = low + half;
-
-    rox_result[num32] r = nums.at(mid);
-    if (not isOk(r)) { return -1; }
-    num32 midVal = getValue(r);
-
-    if (midVal == target) {
-        return mid;
-    } else if (midVal < target) {
-        return binary_search_recursive(nums, target, mid + 1, high);
-    } else {
-        return binary_search_recursive(nums, target, low, mid - 1);
+        rox_result[num32] r = nums.at(mid);
+        if (isOk(r)) {
+            num32 midVal = getValue(r);
+            if (midVal == target) {
+                return mid;
+            } else if (midVal < target) {
+                return binary_search_recursive(nums, target, mid + 1, high);
+            } else {
+                return binary_search_recursive(nums, target, low, mid - 1);
+            }
+        }
     }
+
+    return -1;
 }
 
 function search(list[num32] nums, num32 target) -> num {
