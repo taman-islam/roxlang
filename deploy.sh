@@ -7,8 +7,7 @@ echo "Deploying to Google Cloud Run..."
 gcloud run deploy rox-playground \
     --source . \
     --platform managed \
-    --region us-central1 \
-    --allow-unauthenticated \
+    --region us-east1 \
     --port 3000
 
 echo "Done!"
