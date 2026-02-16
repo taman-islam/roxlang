@@ -110,11 +110,13 @@ ROX prioritizes clarity over convenience. Explicitness may cost more keystrokes,
 - `list[T]`
 - `dictionary[K, V]`
 - `rox_result[T]`
+- User-defined record types
 
 ### Control Flow
 
 - `if` / `else`
 - `for i in range(start, end, step)`
+- `for item in collection`
 - `break`
 - `continue`
 
@@ -124,10 +126,9 @@ ROX prioritizes clarity over convenience. Explicitness may cost more keystrokes,
 - `isOk(rox_result[T]) -> bool`
 - `getValue(rox_result[T]) -> T`
 - `getError(rox_result[T]) -> string`
+- `default(T) -> T` (zero/empty value for any type)
 
 ### Math Library
-
-
 
 #### `int64`
 
@@ -209,6 +210,31 @@ Comments are single-line and start with `//`.
 // This is a comment
 int64 x = 10; // This is also a comment
 ```
+
+## User-Defined Types (Records)
+
+ROX supports user-defined record types with named, typed fields.
+
+```rox
+type User {
+    id: int64
+    name: string
+}
+
+function main() -> none {
+    User u = User{ id: 7, name: "Taman" };
+    print(u.name, "\n");
+
+    u.name = "Apon";
+    print(u.name, "\n");
+
+    // Zero constructor
+    User empty = default(User);
+    print(empty.id, "\n"); // 0
+}
+```
+
+Records have copy semantics, support nested composition, and enforce all fields at construction time. Functions operate on records as parameters and return values — no methods.
 
 ## Compilation Model
 

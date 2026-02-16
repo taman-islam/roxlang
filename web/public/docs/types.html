@@ -181,6 +181,57 @@ if (isOk(result)) {
 }</code></pre>
     <p>Use <code>getError(result)</code> to retrieve the error message (string) if <code>isOk()</code> returns false.
     </p>
+
+    <h2>Record Types</h2>
+    <p>User-defined types with named, typed fields. Define with the <code>type</code> keyword.</p>
+    <pre><code>type User {
+    id: int64
+    name: string
+}</code></pre>
+
+    <h3>Construction</h3>
+    <p>All fields are required. Use named-field initializers:</p>
+    <pre><code>User u = User{ id: 7, name: "Taman" };</code></pre>
+
+    <h3>Field Access &amp; Mutation</h3>
+    <pre><code>print(u.name);       // access
+u.name = "Apon";      // mutation</code></pre>
+
+    <h3>Copy Semantics</h3>
+    <p>Assignment copies the entire record. No aliasing.</p>
+    <pre><code>User b = a;  // b is an independent copy</code></pre>
+
+    <h3>Zero Constructor</h3>
+    <p><code>default(T)</code> returns the zero/empty value for any type:</p>
+    <pre><code>User empty = default(User);    // id=0, name=""
+string s = default(string);    // ""
+int64 n = default(int64);      // 0
+list[int64] l = default(list[int64]);  // []</code></pre>
+    <p><strong>Rule</strong>: Uninitialized record declarations are banned. <code>User u;</code> is a compile error.</p>
+
+    <h3>Nested Records</h3>
+    <pre><code>type Address {
+    city: string
+    country: string
+}
+
+type User {
+    id: int64
+    address: Address
+}
+
+User u = default(User);
+print(u.address.city);  // ""</code></pre>
+
+    <h3>Compile-Time Checks</h3>
+    <ul>
+      <li>Missing required fields</li>
+      <li>Unknown field names</li>
+      <li>Duplicate fields</li>
+      <li>Field type mismatches</li>
+      <li>Unknown field access</li>
+      <li>Uninitialized record declaration</li>
+    </ul>
   </div>
 </body>
 

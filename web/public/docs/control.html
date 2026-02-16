@@ -136,6 +136,13 @@ for i in range(10, 0, -1) {
       Step must not be 0 (compile-time error for literal 0, runtime error otherwise).
       Negative steps are supported.</p>
 
+    <h3>Iterating Lists</h3>
+    <p>Use <code>for item in list</code> to iterate over any <code>list[T]</code>.</p>
+    <pre><code>list[int64] nums = [1, 2, 3];
+for n in nums {
+    print(n, " ");
+}</code></pre>
+
     <h2>Loop Control</h2>
     <h3>break</h3>
     <p>Terminates the nearest enclosing loop immediately.</p>

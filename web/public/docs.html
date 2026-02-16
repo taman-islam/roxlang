@@ -217,12 +217,14 @@
       <li><code>dictionary[K, V]</code></li>
       <li><code>rox_result[T]</code></li>
       <li><code>string</code> (Immutable)</li>
+      <li>User-defined record types</li>
     </ul>
 
     <h3>Control Flow</h3>
     <ul>
       <li><code>if</code> / <code>else</code></li>
       <li><code>for i in range(start, end, step)</code></li>
+      <li><code>for item in collection</code> (iterate lists)</li>
       <li><code>break</code></li>
       <li><code>continue</code></li>
     </ul>
@@ -233,6 +235,7 @@
       <li><code>isOk(rox_result[T]) -> bool</code></li>
       <li><code>getValue(rox_result[T]) -> T</code></li>
       <li><code>getError(rox_result[T]) -> string</code></li>
+      <li><code>default(T) -> T</code> (zero/empty value for any type)</li>
     </ul>
 
     <h3>Comments</h3>
@@ -284,6 +287,25 @@ if (isOk(r)) {
     return [-1, -1];
 }</code></pre>
     <p>Nothing throws. Nothing hides.</p>
+
+    <h2>User-Defined Types (Records)</h2>
+    <p>Define types with named, typed fields. All fields are required at construction.</p>
+    <pre><code>type User {
+    id: int64
+    name: string
+}
+
+function main() -> none {
+    User u = User{ id: 7, name: "Taman" };
+    print(u.name, "\n");
+
+    User empty = default(User);  // zero constructor
+    print(empty.id, "\n");       // 0
+}</code></pre>
+    <p>Records support field access (<code>u.name</code>), field mutation (<code>u.name = "Apon"</code>),
+      copy semantics, nested composition, and functions as parameters/return values.</p>
+    <p><strong>Compile-time checks</strong>: missing fields, unknown fields, duplicate fields, type mismatches,
+      and uninitialized declarations are all caught at compile time.</p>
 
     <h2>Download &amp; Build</h2>
     <p>You can verify and run algorithms locally using the <a href="/" style="color: #569cd6;">Playground</a> or by

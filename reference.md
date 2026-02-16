@@ -90,6 +90,67 @@ ROX is a statically typed language. All types must be explicit.
   dictionary[string, int64] scores;
   ```
 
+### Record Types
+
+User-defined types with named, typed fields.
+
+```rox
+type User {
+    id: int64
+    name: string
+}
+```
+
+**Construction** — all fields are required, using named-field initializers:
+
+```rox
+User u = User{ id: 7, name: "Taman" };
+```
+
+**Field Access & Assignment:**
+
+```rox
+print(u.name);      // field access
+u.name = "Apon";     // field mutation
+```
+
+**Copy Semantics** — assignment copies the entire record:
+
+```rox
+User b = a;  // b is an independent copy
+```
+
+**Nested Records:**
+
+```rox
+type Address {
+    city: string
+    country: string
+}
+
+type User {
+    id: int64
+    address: Address
+}
+```
+
+**Functions on Records** — no methods, just functions:
+
+```rox
+function label(User u) -> string {
+    return u.name;
+}
+```
+
+**Compile-time errors:**
+
+- Missing required field
+- Unknown field name
+- Duplicate field
+- Field type mismatch
+- Unknown field access
+- Uninitialized record declaration (`User u;`)
+
 ### Result Type
 
 - `rox_result[T]`: Explicit error handling type.
@@ -133,6 +194,17 @@ for i in range(10, 0, -1) { ... }
 ```
 
 **Note**: `range(start, end, step)` is a standard built-in function. End is exclusive. Step must not be 0 (compile-time error if literal, runtime error otherwise). Negative steps are supported.
+
+### Iterating Collections
+
+```rox
+list[int64] nums = [1, 2, 3];
+for n in nums {
+    print(n, " ");
+}
+```
+
+The `for item in collection` form works with any `list[T]`.
 
 ### Loop Control
 
@@ -252,6 +324,15 @@ logger("Log this message\n");
 - `isOk(rox_result[T]) -> bool`
 - `getValue(rox_result[T]) -> T`
 - `getError(rox_result[T]) -> string`
+
+- `default(T) -> T`: Returns the zero/empty value for any type.
+  - `default(int64)` → `0`
+  - `default(float64)` → `0.0`
+  - `default(bool)` → `false`
+  - `default(string)` → `""`
+  - `default(list[T])` → `[]`
+  - `default(dict[K,V])` → `{}`
+  - `default(Record)` → fieldwise defaults (recursive)
 
 ## Math Library
 
