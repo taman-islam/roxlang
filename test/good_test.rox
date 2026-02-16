@@ -1,6 +1,6 @@
 // Valid ROX program
 function main() -> none {
-    num32 x = 10n32;
+    int64 x = 10;
     print("Hello, world!\n");
     if (x > 5) {
         print("x is greater than 5\n");
@@ -12,8 +12,6 @@ function main() -> none {
        // We need integer to string conversion?
        // ROX v0 doesn't have `to_string`.
        // We can only print strings? "print(text <list[char]>)".
-       // So we can't print numbers yet!
-       // But we can print dots.
        print(".");
     }
     print("\n");

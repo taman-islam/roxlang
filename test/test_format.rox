@@ -1,11 +1,11 @@
 function main()    ->    none{
     print("Welcome to ROX!\n");
 // 1. Dictionaries
- dictionary[string, num] scores;
+ dictionary[string, int64] scores;
     scores.set("Alice", 100);scores.set("Bob", 200);
 
 // Safe access
-    rox_result[num] res=scores.get("Alice");
+    rox_result[int64] res=scores.get("Alice");
     if(isOk(res)){print("Alice has: ", getValue(res), "\n");}
 
     // 2. Loops & Math

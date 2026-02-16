@@ -1,5 +1,5 @@
 // This verification should fail with a lexer error
 function main ()-> none {
-  num roxv26_illegal = 10;
+  int64 roxv26_illegal = 10;
   print(roxv26_illegal);
 }

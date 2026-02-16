@@ -1,6 +1,6 @@
 function main() -> none {
     print(['T','e','s','t','i','n','g',' ','b','r','e','a','k','\n']);
-    list[num] lst;
+    list[int64] lst;
     repeat i in range(0, 5) {
         if (i == 3) {
             break;

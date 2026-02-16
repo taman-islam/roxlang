@@ -4,7 +4,7 @@
 function is_valid(list[char] s) -> bool {
     list[char] stack = [];
 
-    num n = s.size();
+    int64 n = s.size();
 
     repeat i in range(0, n, 1) {
         rox_result[char] r = s.at(i);
@@ -20,7 +20,7 @@ function is_valid(list[char] s) -> bool {
                     return false;
                 }
 
-                num last_idx = stack.size() - 1;
+                int64 last_idx = stack.size() - 1;
                 rox_result[char] rt = stack.at(last_idx);
 
                 if (isOk(rt)) {

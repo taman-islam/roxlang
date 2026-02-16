@@ -14,18 +14,21 @@ namespace rox {
 struct Type {
     virtual ~Type() = default;
     virtual std::string toString() const = 0;
+    virtual std::unique_ptr<Type> clone() const = 0;
 };
 
 struct PrimitiveType : Type {
     Token token; // e.g. num32, float, etc.
     PrimitiveType(Token token) : token(token) {}
     std::string toString() const override { return token.lexeme; }
+    std::unique_ptr<Type> clone() const override { return std::make_unique<PrimitiveType>(token); }
 };
 
 struct ListType : Type {
     std::unique_ptr<Type> elementType;
     ListType(std::unique_ptr<Type> elementType) : elementType(std::move(elementType)) {}
     std::string toString() const override { return "list[" + elementType->toString() + "]"; }
+    std::unique_ptr<Type> clone() const override { return std::make_unique<ListType>(elementType->clone()); }
 };
 
 struct DictionaryType : Type {
@@ -36,6 +39,9 @@ struct DictionaryType : Type {
     std::string toString() const override {
         return "dictionary[" + keyType->toString() + ", " + valueType->toString() + "]";
     }
+    std::unique_ptr<Type> clone() const override {
+        return std::make_unique<DictionaryType>(keyType->clone(), valueType->clone());
+    }
 };
 
 class RoxResultType : public Type {
@@ -43,6 +49,7 @@ public:
     std::unique_ptr<Type> valueType;
     RoxResultType(std::unique_ptr<Type> valueType) : valueType(std::move(valueType)) {}
     std::string toString() const override { return "result[" + valueType->toString() + "]"; }
+    std::unique_ptr<Type> clone() const override { return std::make_unique<RoxResultType>(valueType->clone()); }
 };
 
 struct FunctionType : Type {
@@ -58,6 +65,11 @@ struct FunctionType : Type {
         }
         s += ") -> " + returnType->toString();
         return s;
+    }
+    std::unique_ptr<Type> clone() const override {
+        std::vector<std::unique_ptr<Type>> paramTypesCopy;
+        for (const auto& t : paramTypes) paramTypesCopy.push_back(t->clone());
+        return std::make_unique<FunctionType>(std::move(paramTypesCopy), returnType->clone());
     }
 };
 

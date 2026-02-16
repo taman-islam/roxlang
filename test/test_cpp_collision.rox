@@ -1,9 +1,9 @@
 // These are C++ keywords but valid ROX identifiers now thanks to namespacing
-num32 class = 10;
-num32 public = 20;
-num32 template = 30;
+int64 class = 10;
+int64 public = 20;
+int64 template = 30;
 
-function virtual() -> num32 {
+function virtual() -> int64 {
     return 40;
 }
 

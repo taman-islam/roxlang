@@ -1,52 +1,52 @@
 function main() -> none {
-    print(num32_abs(-5n32)); // 5
-    print(num32_min(10n32, 5n32)); // 5
-    print(num32_max(10n32, 5n32)); // 10
+    print(int64_abs(-5)); // 5
+    print(int64_min(10, 5)); // 5
+    print(int64_max(10, 5)); // 10
 
-    // num32_pow
-    rox_result[num32] p32 = num32_pow(2n32, 3n32);
+    // int64_pow
+    rox_result[int64] p32 = int64_pow(2, 3);
     if (isOk(p32)) {
         print(getValue(p32)); // 8
     } else {
-        print("Error in num32_pow");
+        print("Error in int64_pow");
     }
 
-    print(num_abs(-5)); // 5
-    print(num_min(10, 5)); // 5
-    print(num_max(10, 5)); // 10
+    print(int64_abs(-5)); // 5
+    print(int64_min(10, 5)); // 5
+    print(int64_max(10, 5)); // 10
 
-    // num_pow
-    rox_result[num] p64 = num_pow(2, 3);
+    // int64_pow
+    rox_result[int64] p64 = int64_pow(2, 3);
     if (isOk(p64)) {
         print(getValue(p64)); // 8
     }
 
-    print(float_abs(-5.5)); // 5.5
-    // float_pow
-    print(float_pow(2.0, 3.0)); // 8.0
+    print(float64_abs(-5.5)); // 5.5
+    // float64_pow
+    print(float64_pow(2.0, 3.0)); // 8.0
 
-    // float_sqrt
-    rox_result[float] s = float_sqrt(4.0);
+    // float64_sqrt
+    rox_result[float64] s = float64_sqrt(4.0);
     if (isOk(s)) {
         print(getValue(s)); // 2.0
     } else {
         print("Error in sqrt");
     }
 
-    print(float_floor(2.9)); // 2.0
-    print(float_ceil(2.1)); // 3.0
-    print(float_exp(1.0)); // ~2.718...
+    print(float64_floor(2.9)); // 2.0
+    print(float64_ceil(2.1)); // 3.0
+    print(float64_exp(1.0)); // ~2.718...
 
-    // float_log
-    rox_result[float] l = float_log(e); // 'e' might not be defined in math test scope, assuming it's available or literal
+    // float64_log
+    rox_result[float64] l = float64_log(e); // 'e' might not be defined in math test scope, assuming it's available or literal
     // Wait, 'e' variable? The previous code used 'e', assuming it's defined somewhere or literal.
-    // Checking previous file content... line 41: rox_result[float] l = float_log(e);
+    // Checking previous file content... line 41: rox_result[float64] l = float64_log(e);
     // There is no definition of 'e' in viewed lines. It might be a global constant or just missing context.
     // I will keep it as 'e'.
     if (isOk(l)) {
         print(getValue(l)); // 1.0
     }
 
-    print(float_sin(0.0)); // 0.0
-    print(float_cos(0.0)); // 1.0
+    print(float64_sin(0.0)); // 0.0
+    print(float64_cos(0.0)); // 1.0
 }

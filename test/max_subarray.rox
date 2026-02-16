@@ -1,18 +1,18 @@
-function max_sub_array(list[num32] nums) -> num32 {
-    num n = nums.size();
+function max_sub_array(list[int64] int64s) -> int64 {
+    int64 n = int64s.size();
 
-    rox_result[num32] r0 = nums.at(0);
+    rox_result[int64] r0 = int64s.at(0);
     if (isOk(r0)) {
-        num32 max_so_far = getValue(r0);
-        num32 current_max = max_so_far;
+        int64 max_so_far = getValue(r0);
+        int64 current_max = max_so_far;
 
         repeat i in range(1, n, 1) {
-            rox_result[num32] r = nums.at(i); // i is num
+            rox_result[int64] r = int64s.at(i); // i is int64
             if (isOk(r)) {
-                num32 x = getValue(r);
+                int64 x = getValue(r);
 
                 // current_max = max(x, current_max + x)
-                num32 sum = current_max + x;
+                int64 sum = current_max + x;
                 if (x > sum) {
                      current_max = x;
                 } else {
@@ -23,23 +23,23 @@ function max_sub_array(list[num32] nums) -> num32 {
                     max_so_far = current_max;
                 }
             } else {
-                return 0n32;
+                return 0;
             }
         }
         return max_so_far;
     }
-    return 0n32;
+    return 0;
 }
 
 function main() -> none {
-    // nums = [-2, 1, -3, 4, -1, 2, 1, -5, 4]
+    // int64s = [-2, 1, -3, 4, -1, 2, 1, -5, 4]
     // Use n32 literals for strict typing
-    list[num32] nums = [-2n32, 1n32, -3n32, 4n32, -1n32, 2n32, 1n32, -5n32, 4n32];
+    list[int64] int64s = [-2, 1, -3, 4, -1, 2, 1, -5, 4];
 
     // Expected: 6 (from [4, -1, 2, 1])
-    num32 res = max_sub_array(nums);
+    int64 res = max_sub_array(int64s);
 
-    if (res == 6n32) {
+    if (res == 6) {
         print("Maximum Subarray: Passed\n");
     } else {
         print("Maximum Subarray: Failed\n");

@@ -3,7 +3,7 @@
 
 // Helper to check if char is in list
 function contains(list[char] items, char c) -> bool {
-    num n = items.size();
+    int64 n = items.size();
     repeat i in range(0, n, 1) {
         rox_result[char] r = items.at(i);
         if (isOk(r)) {
@@ -16,11 +16,11 @@ function contains(list[char] items, char c) -> bool {
     return false;
 }
 
-function length_of_longest_substring(list[char] items) -> num {
-    num n = items.size();
-    num max_len = 0;
+function length_of_longest_substring(list[char] items) -> int64 {
+    int64 n = items.size();
+    int64 max_len = 0;
 
-    num left = 0;
+    int64 left = 0;
 
     repeat k in range(0, n, 1) {
        rox_result[char] r_k = items.at(k);
@@ -29,7 +29,7 @@ function length_of_longest_substring(list[char] items) -> num {
            char c = getValue(r_k);
 
            bool found = false;
-           num found_index = 0;
+           int64 found_index = 0;
 
            repeat j in range(left, k, 1) {
                rox_result[char] r_j = items.at(j);
@@ -48,7 +48,7 @@ function length_of_longest_substring(list[char] items) -> num {
                }
            }
 
-           num current_len = k - left + 1;
+           int64 current_len = k - left + 1;
            if (current_len > max_len) {
                max_len = current_len;
            }

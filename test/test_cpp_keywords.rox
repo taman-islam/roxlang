@@ -1,19 +1,19 @@
-function do() -> num {
+function do() -> int64 {
     return 1;
 }
 
-function class() -> num {
+function class() -> int64 {
     return 2;
 }
 
-function try() -> num {
+function try() -> int64 {
     return 3;
 }
 
 function main() -> none {
-    num a = do();
-    num b = class();
-    num c = try();
+    int64 a = do();
+    int64 b = class();
+    int64 c = try();
 
     if (a + b + c == 6) {
         print("Keywords sanitize test passed\n");

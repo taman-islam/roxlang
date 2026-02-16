@@ -1,0 +1,4 @@
+function main() -> none {
+    dictionary[string, float64] scores;
+    scores.set("Alice", 100); // Should error: 100 is int64, value type is float64
+}

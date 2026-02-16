@@ -1,6 +1,6 @@
 function main() -> none {
     // Dict creation (default init)
-    dictionary[num, string] d;
+    dictionary[int64, string] d;
 
     // Set
     d.set(1, "one");
@@ -42,17 +42,17 @@ function main() -> none {
     }
 
     // String keys
-    dictionary[string, num] ds;
+    dictionary[string, int64] ds;
     ds.set("a", 100);
-    rox_result[num] rs = ds.get("a");
+    rox_result[int64] rs = ds.get("a");
     if (isOk(rs)) {
         print(getValue(rs)); // 100
     }
 
     // getKeys
-    list[num] keys = d.getKeys();
+    list[int64] keys = d.getKeys();
     print(keys.size()); // 1
-    rox_result[num] kopt = keys.at(0);
+    rox_result[int64] kopt = keys.at(0);
     if (isOk(kopt)) {
         print(getValue(kopt)); // 1
     }

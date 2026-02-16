@@ -1,27 +1,27 @@
 // Binary Search
-// Given sorted array nums, return index of target or -1.
+// Given sorted array int64s, return index of target or -1.
 
 
-function binary_search_recursive(list[num32] nums, num32 target, num low, num high) -> num {
+function binary_search_recursive(list[int64] int64s, int64 target, int64 low, int64 high) -> int64 {
     if (low > high) {
         return -1;
     }
 
-    num diff = high - low;
-    rox_result[num] r_div = diff / 2;
+    int64 diff = high - low;
+    rox_result[int64] r_div = diff / 2;
     if (isOk(r_div)) {
-        num half = getValue(r_div);
-        num mid = low + half;
+        int64 half = getValue(r_div);
+        int64 mid = low + half;
 
-        rox_result[num32] r = nums.at(mid);
+        rox_result[int64] r = int64s.at(mid);
         if (isOk(r)) {
-            num32 midVal = getValue(r);
+            int64 midVal = getValue(r);
             if (midVal == target) {
                 return mid;
             } else if (midVal < target) {
-                return binary_search_recursive(nums, target, mid + 1, high);
+                return binary_search_recursive(int64s, target, mid + 1, high);
             } else {
-                return binary_search_recursive(nums, target, low, mid - 1);
+                return binary_search_recursive(int64s, target, low, mid - 1);
             }
         }
     }
@@ -29,19 +29,19 @@ function binary_search_recursive(list[num32] nums, num32 target, num low, num hi
     return -1;
 }
 
-function search(list[num32] nums, num32 target) -> num {
-    num n = nums.size();
+function search(list[int64] int64s, int64 target) -> int64 {
+    int64 n = int64s.size();
     if (n == 0) { return -1; }
-    return binary_search_recursive(nums, target, 0, n - 1);
+    return binary_search_recursive(int64s, target, 0, n - 1);
 }
 
 function main() -> none {
-    list[num32] nums = [-1n32, 0n32, 3n32, 5n32, 9n32, 12n32];
+    list[int64] int64s = [-1, 0, 3, 5, 9, 12];
 
     // Search for 9 (index 4)
-    if (search(nums, 9n32) == 4) {
+    if (search(int64s, 9) == 4) {
         // Search for 2 (not found)
-        if (search(nums, 2n32) == -1) {
+        if (search(int64s, 2) == -1) {
              print("Binary Search: Passed\n");
              return none;
         }

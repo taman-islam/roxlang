@@ -61,19 +61,19 @@ The surface area is intentionally small and opinionated.
 Two Sum implemented in ROX:
 
 ```rox
-function two_sum(list[num] nums, num target) -> list[num] {
-    num n = nums.size();
+function two_sum(list[int64] int64s, int64 target) -> list[int64] {
+    int64 n = int64s.size();
 
     repeat i in range(0, n, 1) {
         repeat j in range(i + 1, n, 1) {
 
-            rox_result[num] r1 = nums.at(i);
+            rox_result[int64] r1 = int64s.at(i);
             if (isOk(r1)) {
-                num v1 = getValue(r1);
+                int64 v1 = getValue(r1);
 
-                rox_result[num] r2 = nums.at(j);
+                rox_result[int64] r2 = int64s.at(j);
                 if (isOk(r2)) {
-                    num v2 = getValue(r2);
+                    int64 v2 = getValue(r2);
 
                     if (v1 + v2 == target) {
                         return [i, j];
@@ -101,9 +101,9 @@ ROX prioritizes clarity over convenience. Explicitness may cost more keystrokes,
 
 ### Types
 
-- `num` (64 bit signed integer)
+- `int64` (64 bit signed integer)
 - `bool`
-- `float`
+- `float64`
 - `char`
 - `string`
 - `none`
@@ -120,55 +120,50 @@ ROX prioritizes clarity over convenience. Explicitness may cost more keystrokes,
 
 ### Built-in Functions
 
-- `print(val) -> none` (supports string, num, float, bool, char, list)
+- `print(val) -> none` (supports string, int64, float64, bool, char, list)
 - `isOk(rox_result[T]) -> bool`
 - `getValue(rox_result[T]) -> T`
 - `getError(rox_result[T]) -> string`
 
 ### Math Library
 
-#### `num32`
 
-- `num32_abs(n)`
-- `num32_min(a, b)`
-- `num32_max(a, b)`
-- `num32_pow(base, exp) -> rox_result[num32]`
 
-#### `num`
+#### `int64`
 
-- `num_abs(n)`
-- `num_min(a, b)`
-- `num_max(a, b)`
-- `num_pow(base, exp) -> rox_result[num]`
+- `int64_abs(n)`
+- `int64_min(a, b)`
+- `int64_max(a, b)`
+- `int64_pow(base, exp) -> rox_result[int64]`
 
-#### `float`
+#### `float64`
 
-- `float_abs(n)`
-- `float_min(a, b)`
-- `float_max(a, b)`
-- `float_pow(base, exp)`
-- `float_sqrt(n) -> rox_result[float]`
-- `float_sin(n)`
-- `float_cos(n)`
-- `float_tan(n)`
-- `float_log(n) -> rox_result[float]`
-- `float_exp(n)`
-- `float_floor(n)`
-- `float_ceil(n)`
+- `float64_abs(n)`
+- `float64_min(a, b)`
+- `float64_max(a, b)`
+- `float64_pow(base, exp)`
+- `float64_sqrt(n) -> rox_result[float64]`
+- `float64_sin(n)`
+- `float64_cos(n)`
+- `float64_tan(n)`
+- `float64_log(n) -> rox_result[float64]`
+- `float64_exp(n)`
+- `float64_floor(n)`
+- `float64_ceil(n)`
 
 #### Constants
 
-- `pi` (float)
-- `e` (float)
+- `pi` (float64)
+- `e` (float64)
 
 ## Error Model
 
 ROX does not use exceptions. Errors are explicit values:
 
 ```rox
-rox_result[num] r = nums.at(i);
+rox_result[int64] r = int64s.at(i);
 if (isOk(r)) {
-    num value = getValue(r);
+    int64 value = getValue(r);
 } else {
     return [-1, -1];
 }
@@ -199,7 +194,7 @@ print("\n");
 Hash maps for key-value storage.
 
 ```rox
-dictionary[string, num] scores;
+dictionary[string, int64] scores;
 scores.set("Alice", 100);
 if (scores.has("Alice")) {
     print(scores.get("Alice"));
@@ -212,7 +207,7 @@ Comments are single-line and start with `//`.
 
 ```rox
 // This is a comment
-num x = 10; // This is also a comment
+int64 x = 10; // This is also a comment
 ```
 
 ## Compilation Model

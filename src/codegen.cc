@@ -92,9 +92,7 @@ void Codegen::emitPreamble() {
     out << "#include <functional>\n"; // For std::function literals
 
     out << "\n// ROX Runtime\n";
-    out << "using num32 = int32_t;\n";
-    out << "using num = int64_t;\n";
-    out << "using rox_float = double;\n";
+    // out << "using num = int64_t;\n"; // Removed usage of num
 
     out << "using rox_char = char;\n";
     out << "using rox_bool = bool;\n";
@@ -110,7 +108,7 @@ void Codegen::emitPreamble() {
     out << "    RoxString(std::string s) : val(std::move(s)) {}\n";
     out << "    RoxString() = default;\n";
     out << "\n";
-    out << "    num size() const { return (num)val.size(); }\n";
+    out << "    int64_t size() const { return (int64_t)val.size(); }\n";
     out << "    bool operator==(const RoxString& other) const { return val == other.val; }\n";
     out << "    bool operator!=(const RoxString& other) const { return val != other.val; }\n";
     out << "};\n";
@@ -150,7 +148,7 @@ void Codegen::emitPreamble() {
     out << "    return r.err;\n";
     out << "}\n";
 
-    out << "void print_loop(num32 n) {\n";
+    out << "void print_loop(int64_t n) {\n";
     out << "    for (int i = 0; i < n; ++i) {\n";
     out << "        std::cout << \"Hello, World!\" << std::endl;\n";
     out << "    }\n";
@@ -181,15 +179,15 @@ void Codegen::emitPreamble() {
     out << "\n";
     out << "// List access\n";
     out << "template<typename T>\n";
-    out << "rox_result<T> rox_at(const std::vector<T>& xs, num i) {\n";
-    out << "    if (i < 0 || i >= (num)xs.size()) return error<T>(\"Index out of bounds\");\n";
+    out << "rox_result<T> rox_at(const std::vector<T>& xs, int64_t i) {\n";
+    out << "    if (i < 0 || i >= (int64_t)xs.size()) return error<T>(\"Index out of bounds\");\n";
     out << "    return ok(xs[i]);\n";
     out << "}\n";
     out << "\n";
     out << "// List Set\n";
     out << "template<typename T>\n";
-    out << "void rox_set(std::vector<T>& xs, num i, T val) {\n";
-    out << "    if (i < 0 || i >= (num)xs.size()) {\n";
+    out << "void rox_set(std::vector<T>& xs, int64_t i, T val) {\n";
+    out << "    if (i < 0 || i >= (int64_t)xs.size()) {\n";
     out << "        std::cerr << \"Error: Index out of bounds in list.set\" << std::endl;\n";
     out << "        exit(1);\n";
     out << "    }\n";
@@ -197,7 +195,7 @@ void Codegen::emitPreamble() {
     out << "}\n";
     out << "\n";
     out << "// String access\n";
-    out << "rox_result<char> rox_at(const RoxString& s, num i) {\n";
+    out << "rox_result<char> rox_at(const RoxString& s, int64_t i) {\n";
     out << "    if (i < 0 || i >= s.size()) return error<char>(\"Index out of bounds\");\n";
     out << "    return ok(s.val[i]);\n";
     out << "}\n";
@@ -265,44 +263,34 @@ void Codegen::emitPreamble() {
     out << "}\n";
     out << "\n";
 
-    out << "num32 num32_abs(num32 x) { return std::abs(x); }\n";
-    out << "num32 num32_min(num32 x, num32 y) { return std::min(x, y); }\n";
-    out << "num32 num32_max(num32 x, num32 y) { return std::max(x, y); }\n";
-    out << "rox_result<num32> num32_pow(num32 base, num32 exp) {\n";
-    out << "    if (exp < 0) return error<num32>(\"Negative exponent\");\n";
-    out << "    num32 res = 1;\n";
+    out << "int64_t int64_abs(int64_t x) { return std::abs(x); }\n";
+    out << "int64_t int64_min(int64_t x, int64_t y) { return std::min(x, y); }\n";
+    out << "int64_t int64_max(int64_t x, int64_t y) { return std::max(x, y); }\n";
+    out << "rox_result<int64_t> int64_pow(int64_t base, int64_t exp) {\n";
+    out << "    if (exp < 0) return error<int64_t>(\"Negative exponent\");\n";
+    out << "    int64_t res = 1;\n";
     out << "    for (int i = 0; i < exp; ++i) res *= base;\n";
     out << "    return ok(res);\n";
     out << "}\n";
     out << "\n";
-    out << "num num_abs(num x) { return std::abs(x); }\n";
-    out << "num num_min(num x, num y) { return std::min(x, y); }\n";
-    out << "num num_max(num x, num y) { return std::max(x, y); }\n";
-    out << "rox_result<num> num_pow(num base, num exp) {\n";
-    out << "    if (exp < 0) return error<num>(\"Negative exponent\");\n";
-    out << "    num res = 1;\n";
-    out << "    for (int i = 0; i < exp; ++i) res *= base;\n";
-    out << "    return ok(res);\n";
-    out << "}\n";
-    out << "\n";
-    out << "double float_abs(double x) { return std::abs(x); }\n";
-    out << "double float_min(double x, double y) { return std::min(x, y); }\n";
-    out << "double float_max(double x, double y) { return std::max(x, y); }\n";
-    out << "double float_pow(double x, double y) { return std::pow(x, y); }\n";
-    out << "rox_result<double> float_sqrt(double x) {\n";
+    out << "double float64_abs(double x) { return std::abs(x); }\n";
+    out << "double float64_min(double x, double y) { return std::min(x, y); }\n";
+    out << "double float64_max(double x, double y) { return std::max(x, y); }\n";
+    out << "double float64_pow(double x, double y) { return std::pow(x, y); }\n";
+    out << "rox_result<double> float64_sqrt(double x) {\n";
     out << "    if (x < 0) return error<double>(\"Negative input for sqrt\");\n";
     out << "    return ok(std::sqrt(x));\n";
     out << "}\n";
-    out << "double float_sin(double x) { return std::sin(x); }\n";
-    out << "double float_cos(double x) { return std::cos(x); }\n";
-    out << "double float_tan(double x) { return std::tan(x); }\n";
-    out << "rox_result<double> float_log(double x) {\n";
+    out << "double float64_sin(double x) { return std::sin(x); }\n";
+    out << "double float64_cos(double x) { return std::cos(x); }\n";
+    out << "double float64_tan(double x) { return std::tan(x); }\n";
+    out << "rox_result<double> float64_log(double x) {\n";
     out << "    if (x <= 0) return error<double>(\"Non-positive input for log\");\n";
     out << "    return ok(std::log(x));\n";
     out << "}\n";
-    out << "double float_exp(double x) { return std::exp(x); }\n";
-    out << "double float_floor(double x) { return std::floor(x); }\n";
-    out << "double float_ceil(double x) { return std::ceil(x); }\n";
+    out << "double float64_exp(double x) { return std::exp(x); }\n";
+    out << "double float64_floor(double x) { return std::floor(x); }\n";
+    out << "double float64_ceil(double x) { return std::ceil(x); }\n";
     out << "\n";
     out << "\n";
     out << "\n";
@@ -350,11 +338,10 @@ void Codegen::genExpr(Expr* expr) {
 void Codegen::genType(Type* type) {
     if (auto* t = dynamic_cast<PrimitiveType*>(type)) {
         std::string s = t->token.lexeme;
-        if (s == "num32") out << "num32";
-        else if (t->token.type == TokenType::TYPE_NUM) { // Corrected from `kind == TokenType::TYPE_NUM`
-            out << "num";
+        if (t->token.type == TokenType::TYPE_INT64) {
+            out << "int64_t";
         }
-        else if (s == "float") out << "double";
+        else if (t->token.type == TokenType::TYPE_FLOAT64) out << "double";
         else if (s == "bool") out << "bool";
         else if (s == "char") out << "char";
         else if (s == "string") out << "RoxString";
@@ -622,17 +609,10 @@ void Codegen::genLiteral(LiteralExpr* expr) {
         out << "rox_str(" << expr->value.lexeme << ")";
     } else if (expr->value.type == TokenType::NUMBER_INT) {
         std::string s = expr->value.lexeme;
-        size_t npos = s.find('n');
-        if (npos != std::string::npos) {
-            // has 'n' -> likely n32 (since we removed n64 parser support)
-            // Just output the number part
-            out << s.substr(0, npos);
-        } else {
-            // No suffix -> num64
-            // Cast to (num) to ensure std::vector deduction picks up vector<num>
-            // instead of vector<long long> (which might differ from num=int64_t=long on Mac)
-            out << "((num)" << s << ")";
-        }
+        // No suffix -> num64
+        // Cast to (num) to ensure std::vector deduction picks up vector<num>
+        // instead of vector<long long> (which might differ from num=int64_t=long on Mac)
+        out << "((int64_t)" << s << ")";
     } else {
         out << expr->value.lexeme;
     }
@@ -718,6 +698,28 @@ void Codegen::genMethodCall(MethodCallExpr* expr) {
         genExpr(expr->object.get());
         out << ".pop_back()";
     } else if (method == "set") {
+        // Semantic Analysis: Check for dictionary type mismatch
+        auto objType = inferType(expr->object.get());
+        if (auto* dictType = dynamic_cast<DictionaryType*>(objType.get())) {
+             if (expr->arguments.size() < 2) {
+                 std::cerr << "Error: dictionary.set expects 2 arguments." << std::endl;
+                 exit(1);
+             }
+             auto keyType = inferType(expr->arguments[0].get());
+             auto valType = inferType(expr->arguments[1].get());
+
+             if (keyType && keyType->toString() != dictType->keyType->toString()) {
+                  std::cerr << "Type Error: Dictionary key type mismatch. Expected " << dictType->keyType->toString()
+                            << " but got " << keyType->toString() << "." << std::endl;
+                  exit(1);
+             }
+             if (valType && valType->toString() != dictType->valueType->toString()) {
+                  std::cerr << "Type Error: Dictionary value type mismatch. Expected " << dictType->valueType->toString()
+                            << " but got " << valType->toString() << "." << std::endl;
+                  exit(1);
+             }
+        }
+
         out << "rox_set(";
         genExpr(expr->object.get());
         out << ", ";
@@ -739,7 +741,7 @@ void Codegen::genMethodCall(MethodCallExpr* expr) {
         out << ")";
     } else if (method == "size") {
         // cast to num for strict typing
-        out << "((num)";
+        out << "((int64_t)";
         genExpr(expr->object.get());
         out << ".size())";
     } else if (method == "getKeys") {
@@ -793,4 +795,27 @@ std::string Codegen::sanitize(const std::string& name) {
     return "roxv26_" + name;
 }
 
+std::unique_ptr<Type> Codegen::inferType(Expr* expr) {
+    if (!expr) return nullptr;
+
+    if (auto* lit = dynamic_cast<LiteralExpr*>(expr)) {
+        if (lit->value.type == TokenType::NUMBER_INT) return std::make_unique<PrimitiveType>(Token{TokenType::TYPE_INT64, "int64", lit->value.line});
+        if (lit->value.type == TokenType::NUMBER_FLOAT) return std::make_unique<PrimitiveType>(Token{TokenType::TYPE_FLOAT64, "float64", lit->value.line});
+        if (lit->value.type == TokenType::STRING) return std::make_unique<PrimitiveType>(Token{TokenType::TYPE_STRING, "string", lit->value.line});
+        if (lit->value.type == TokenType::CHAR_LITERAL) return std::make_unique<PrimitiveType>(Token{TokenType::TYPE_CHAR, "char", lit->value.line});
+        if (lit->value.type == TokenType::TRUE || lit->value.type == TokenType::FALSE) return std::make_unique<PrimitiveType>(Token{TokenType::TYPE_BOOL, "bool", lit->value.line});
+        if (lit->value.type == TokenType::NONE) return std::make_unique<PrimitiveType>(Token{TokenType::NONE, "none", lit->value.line});
+    }
+
+    if (auto* var = dynamic_cast<VariableExpr*>(expr)) {
+        VarInfo* info = resolveVar(var->name.lexeme);
+        if (info && info->type) {
+             return info->type->clone();
+        }
+    }
+
+    return nullptr;
+}
+
 } // namespace rox
+

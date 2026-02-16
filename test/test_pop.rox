@@ -2,18 +2,18 @@
 // Test pop behavior
 
 function main() -> none {
-    list[num] nums = [1, 2, 3];
+    list[int64] int64s = [1, 2, 3];
 
     // Pop 3
-    nums.pop();
+    int64s.pop();
     print("Popped once\n");
 
     // Pop 2
-    nums.pop();
+    int64s.pop();
     print("Popped twice\n");
 
     // Pop 1
-    nums.pop();
+    int64s.pop();
     print("Popped thrice\n");
 
     // Pop from empty (undefined behavior in C++ generally, but std::vector::pop_back on empty is UB.
@@ -23,6 +23,6 @@ function main() -> none {
     // For now, I'll avoid popping empty in test or just print size.
 
     print("Final size: ");
-    print(nums.size());
+    print(int64s.size());
     print("\n");
 }

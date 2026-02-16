@@ -1,22 +1,22 @@
-function add(num a, num b) -> num {
+function add(int64 a, int64 b) -> int64 {
     return a + b;
 }
 
-function subtract(num a, num b) -> num {
+function subtract(int64 a, int64 b) -> int64 {
     return a - b;
 }
 
-function apply(function(num, num) -> num f, num a, num b) -> num {
+function apply(function(int64, int64) -> int64 f, int64 a, int64 b) -> int64 {
     return f(a, b);
 }
 
-function get_adder() -> function(num, num) -> num {
+function get_adder() -> function(int64, int64) -> int64 {
     return add;
 }
 
 function main() -> none {
     // Test assignment
-    function(num, num) -> num op = add;
+    function(int64, int64) -> int64 op = add;
     print(op(10, 5)); // Expect 15.000000 (or just 15)
 
     op = subtract;
@@ -27,6 +27,6 @@ function main() -> none {
     print(apply(subtract, 20, 10)); // Expect 10.000000
 
     // Test returning function
-    function(num, num) -> num adder = get_adder();
+    function(int64, int64) -> int64 adder = get_adder();
     print(adder(3, 4)); // Expect 7.000000
 }

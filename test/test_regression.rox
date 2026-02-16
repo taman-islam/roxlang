@@ -1,10 +1,10 @@
 function main() -> none {
     // Test standard declaration with assignment
-    num x = 10;
+    int64 x = 10;
     print(x);
 
-    // Test num32
-    num32 y = 20;
+    // Test int64
+    int64 y = 20;
     print(y);
 
     // Test string

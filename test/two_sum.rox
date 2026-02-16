@@ -1,22 +1,22 @@
 // Two Sum
-// Given nums array and target, return indices of two numbers that add up to target.
+// Given int64s array and target, return indices of two numbers that add up to target.
 
-function two_sum(list[num32] nums, num32 target) -> list[num] {
-    num n = nums.size();
+function two_sum(list[int64] int64s, int64 target) -> list[int64] {
+    int64 n = int64s.size();
 
-    // i, j are num from range
+    // i, j are int64 from range
     repeat i in range(0, n, 1) {
         repeat j in range(i + 1, n, 1) {
 
             // Handle result explicitly
-            rox_result[num32] r1 = nums.at(i);
+            rox_result[int64] r1 = int64s.at(i);
 
             if (isOk(r1)) {
-                num32 v1 = getValue(r1);
+                int64 v1 = getValue(r1);
 
-                rox_result[num32] r2 = nums.at(j);
+                rox_result[int64] r2 = int64s.at(j);
                 if (isOk(r2)) {
-                    num32 v2 = getValue(r2);
+                    int64 v2 = getValue(r2);
 
                     if (v1 + v2 == target) {
                         return [i, j];
@@ -33,16 +33,16 @@ function two_sum(list[num32] nums, num32 target) -> list[num] {
 }
 
 function main() -> none {
-    // 2 is num64 by default. 2n32 is num32.
-    list[num32] nums = [2n32, 7n32, 11n32, 15n32];
-    num32 target = 9n32;
+    // 2 is int6464 by default. 2 is int64.
+    list[int64] int64s = [2, 7, 11, 15];
+    int64 target = 9;
 
-    list[num] result = two_sum(nums, target);
+    list[int64] result = two_sum(int64s, target);
 
     // We expect [0, 1]
     if (result.size() == 2) {
-        rox_result[num] r0 = result.at(0);
-        rox_result[num] r1 = result.at(1);
+        rox_result[int64] r0 = result.at(0);
+        rox_result[int64] r1 = result.at(1);
 
         if (isOk(r0)) {
             if (isOk(r1)) {

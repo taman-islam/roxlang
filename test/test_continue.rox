@@ -1,7 +1,7 @@
 function main() -> none {
-    list[num] lst;
+    list[int64] lst;
     repeat i in range(0, 5) {
-        rox_result[num] g = i%2;
+        rox_result[int64] g = i%2;
         if(isOk(g)) {
             if(getValue(g) == 0) {
                 continue;
@@ -17,7 +17,7 @@ function main() -> none {
         return;
     }
     repeat i in range(0, lst.size()) {
-        rox_result[num] got = lst.at(i);
+        rox_result[int64] got = lst.at(i);
         if(isOk(got)) {
             if (not (getValue(got) == (i*2+1))) {
                 print("Error: Expected ", (i*2+1), ", got ", getValue(got), "\n");

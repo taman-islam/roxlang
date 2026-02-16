@@ -150,7 +150,6 @@
         <ul>
           <li><code>main</code> function (entry point)</li>
           <li>Built-in functions (<code>print</code>, <code>isOk</code>, etc.)</li>
-          <li>Math library functions (<code>num32_abs</code>, <code>pi</code>, etc.)</li>
           <li>Standard library constants (<code>true</code>, <code>false</code>, <code>none</code>)</li>
         </ul>
       </li>
@@ -159,19 +158,19 @@
       result in a compilation error.</p>
 
     <h2>Example: Two Sum</h2>
-    <pre><code>function two_sum(list[num] nums, num target) -> list[num] {
-    num n = nums.size();
+    <pre><code>function two_sum(list[int64] int64s, int64 target) -> list[int64] {
+    int64 n = int64s.size();
 
     repeat i in range(0, n, 1) {
         repeat j in range(i + 1, n, 1) {
 
-            rox_result[num] r1 = nums.at(i);
+            rox_result[int64] r1 = int64s.at(i);
             if (isOk(r1)) {
-                num v1 = getValue(r1);
+                int64 v1 = getValue(r1);
 
-                rox_result[num] r2 = nums.at(j);
+                rox_result[int64] r2 = int64s.at(j);
                 if (isOk(r2)) {
-                    num v2 = getValue(r2);
+                    int64 v2 = getValue(r2);
 
                     if (v1 + v2 == target) {
                         return [i, j];
@@ -209,8 +208,7 @@
 
     <h3>Types</h3>
     <ul>
-      <li><code>num</code> (int64)</li>
-      <li><code>num32</code> (int32)</li>
+      <li><code>int64</code> (int64)</li>
       <li><code>bool</code></li>
       <li><code>char</code></li>
       <li><code>none</code></li>
@@ -239,52 +237,47 @@
     <h3>Comments</h3>
     <p>ROX supports single-line comments starting with <code>//</code>.</p>
     <pre><code>// This is a comment
-num x = 10; // This is also a comment</code></pre>
+int64 x = 10; // This is also a comment</code></pre>
 
     <h3>Math Library</h3>
-    <h4>num32</h4>
     <ul>
-      <li><code>num32_abs(n)</code></li>
-      <li><code>num32_min(a, b)</code></li>
-      <li><code>num32_max(a, b)</code></li>
-      <li><code>num32_pow(base, exp) -> rox_result[num32]</code></li>
     </ul>
 
-    <h4>num</h4>
+    <h4>int64</h4>
     <ul>
-      <li><code>num_abs(n)</code></li>
-      <li><code>num_min(a, b)</code></li>
-      <li><code>num_max(a, b)</code></li>
-      <li><code>num_pow(base, exp) -> rox_result[num]</code></li>
+      <li><code>int64_abs(n)</code></li>
+      <li><code>int64_min(a, b)</code></li>
+      <li><code>int64_max(a, b)</code></li>
+      <li><code>int64_pow(base, exp) -> rox_result[int64]</code></li>
     </ul>
 
-    <h4>float</h4>
+    <h4>float64</h4>
     <ul>
-      <li><code>float_abs(n)</code></li>
-      <li><code>float_min(a, b)</code></li>
-      <li><code>float_max(a, b)</code></li>
-      <li><code>float_pow(base, exp)</code></li>
-      <li><code>float_sqrt(n) -> rox_result[float]</code></li>
-      <li><code>float_sin(n)</code></li>
-      <li><code>float_cos(n)</code></li>
-      <li><code>float_tan(n)</code></li>
-      <li><code>float_log(n) -> rox_result[float]</code></li>
-      <li><code>float_exp(n)</code></li>
-      <li><code>float_floor(n)</code></li>
-      <li><code>float_ceil(n)</code></li>
+      <li><code>float64_abs(n)</code></li>
+      <li><code>float64_min(a, b)</code></li>
+      <li><code>float64_max(a, b)</code></li>
+      <li><code>float64_pow(base, exp)</code></li>
+      <li><code>float64_sqrt(n) -> rox_result[float64]</code></li>
+      <li><code>float64_sin(n)</code></li>
+      <li><code>float64_cos(n)</code></li>
+      <li><code>float64_tan(n)</code></li>
+      <li><code>float64_log(n) -> rox_result[float64]</code></li>
+      <li><code>float64_exp(n)</code></li>
+      <li><code>float64_floor(n)</code></li>
+      <li><code>float64_ceil(n)</code></li>
     </ul>
 
     <h4>Constants</h4>
     <ul>
-      <li><code>pi</code> (float)</li>
-      <li><code>e</code> (float)</li>
+      <li><code>pi</code> (float64)</li>
+      <li><code>e</code> (float64)</li>
     </ul>
 
     <h2>Error Model</h2>
     <p>ROX does not use exceptions. Errors are explicit values:</p>
-    <pre><code>rox_result[num] r = nums.at(i);
+    <pre><code>rox_result[int64] r = int64s.at(i);
 if (isOk(r)) {
-    num value = getValue(r);
+    int64 value = getValue(r);
 } else {
     print("Error: ", getError(r), "\n");
     return [-1, -1];

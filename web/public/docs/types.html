@@ -112,14 +112,11 @@
 
     <h2>Primitive Types</h2>
 
-    <h3>num <span class="type-tag">64-bit Signed Integer</span></h3>
+    <h3>int64 <span class="type-tag">64-bit Signed Integer</span></h3>
     <p>The default integer type. Used for most arithmetic and list indexing.</p>
-    <pre><code>num x = 42;
-num y = -100;</code></pre>
+    <pre><code>int64 x = 42;
+int64 y = -100;</code></pre>
 
-    <h3>num32 <span class="type-tag">32-bit Signed Integer</span></h3>
-    <p>A smaller integer type, useful for compatibility or memory optimization.</p>
-    <pre><code>num32 i = 10n; // 'n' suffix denotes num32 literal</code></pre>
 
     <h3>bool <span class="type-tag">Boolean</span></h3>
     <p>Values: <code>true</code> or <code>false</code>.</p>
@@ -133,7 +130,7 @@ if (is_valid) { ... }</code></pre>
     <h3>string <span class="type-tag">String</span></h3>
     <p>Immutable sequence of bytes (UTF-8). Literals use double quotes.</p>
     <pre><code>string s = "Hello";
-num len = s.size();
+int64 len = s.size();
 rox_result[char] c = s.at(0);
 
 print(s); // Prints "Hello"</code></pre>
@@ -149,19 +146,19 @@ print(s); // Prints "Hello"</code></pre>
     <h2>Composite Types</h2>
     <h3>list[T] <span class="type-tag">Dynamic Array</span></h3>
     <p>Ordered collection of elements of type <code>T</code>.</p>
-    <pre><code>list[num] numbers = [1, 2, 3];
-rox_result[num] res = numbers.at(0);
+    <pre><code>list[int64] numbers = [1, 2, 3];
+rox_result[int64] res = numbers.at(0);
 if (isOk(res)) {
-    num first = getValue(res);
+    int64 first = getValue(res);
 }</code></pre>
 
     <h3>dictionary[K, V] <span class="type-tag">Hash Map</span></h3>
-    <p>Key-value pairs. Keys must be comparable (num, string, bool, char).</p>
-    <pre><code>dictionary[string, num] scores;
+    <p>Key-value pairs. Keys must be comparable (int64, string, bool, char).</p>
+    <pre><code>dictionary[string, int64] scores;
 scores.set("Alice", 100);
-rox_result[num] res = scores.get("Alice");
+rox_result[int64] res = scores.get("Alice");
 if (isOk(res)) {
-    num score = getValue(res);
+    int64 score = getValue(res);
 }</code></pre>
 
     <h2>Result Type</h2>
@@ -170,10 +167,10 @@ if (isOk(res)) {
     <p>You must check if the result is valid using <code>isOk()</code> before extracting the value with
       <code>getValue()</code>.
     </p>
-    <pre><code>rox_result[num] result = list.at(5);
+    <pre><code>rox_result[int64] result = list.at(5);
 
 if (isOk(result)) {
-    num val = getValue(result);
+    int64 val = getValue(result);
 } else {
     print("Error: ", getError(result), "\n");
 }</code></pre>

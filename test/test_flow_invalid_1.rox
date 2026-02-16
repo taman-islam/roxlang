@@ -1,8 +1,8 @@
 function main() -> none {
-    list[num] nums = [1, 2, 3];
-    rox_result[num] res = nums.at(0);
+    list[int64] int64s = [1, 2, 3];
+    rox_result[int64] res = int64s.at(0);
 
     // Unsafe access: used without checking isOk(res)
-    num val = getValue(res);
+    int64 val = getValue(res);
     print(val);
 }

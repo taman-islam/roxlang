@@ -113,19 +113,19 @@
     <h2>Lists</h2>
     <p>A dynamically sized array of elements of Type <code>T</code>.</p>
 
-    <pre><code>list[num] numbers = [1, 2, 3];
+    <pre><code>list[int64] numbers = [1, 2, 3];
     list[char] chars = ['a', 'b', 'c'];</code></pre>
 
     <h3>Access</h3>
     <p>Access is strictly checked. <code>.at(index)</code> returns a <code>rox_result[T]</code>.</p>
-    <pre><code>rox_result[num] res = numbers.at(0);
+    <pre><code>rox_result[int64] res = numbers.at(0);
 if (isOk(res)) {
-    num val = getValue(res);
+    int64 val = getValue(res);
 }</code></pre>
 
     <h3>Methods</h3>
     <ul>
-      <li><code>.size() -> num</code>: Returns the number of elements.</li>
+      <li><code>.size() -> int64</code>: Returns the int64ber of elements.</li>
       <li><code>.append(item) -> none</code>: Adds an item to the end.</li>
       <li><code>.pop() -> none</code>: Removes the last item.</li>
       <li><code>.at(index) -> rox_result[T]</code>: Safely retrieves an item.</li>
@@ -135,10 +135,10 @@ if (isOk(res)) {
     <p>A key-value map of elements of Type <code>K</code> and <code>V</code>.</p>
 
     <h3>Declaration</h3>
-    <pre><code>dictionary[num, string] d;
+    <pre><code>dictionary[int64, string] d;
 d.set(1, "one");
 
-dictionary[string, num] scores;
+dictionary[string, int64] scores;
 scores.set("player1", 100);</code></pre>
 
     <h3>Verification</h3>
@@ -153,7 +153,7 @@ if (isOk(res)) {
       <li><code>.set(key, value) -> none</code>: Inserts or updates a key-value pair.</li>
       <li><code>.remove(key) -> none</code>: Removes the key and its value.</li>
       <li><code>.has(key) -> bool</code>: Checks if a key exists.</li>
-      <li><code>.size() -> num</code>: Returns the number of elements.</li>
+      <li><code>.size() -> int64</code>: Returns the int64ber of elements.</li>
       <li><code>.get(key) -> rox_result[V]</code>: Safely retrieves a value.</li>
       <li><code>.getKeys() -> list[K]</code>: Returns a list of all keys.</li>
     </ul>

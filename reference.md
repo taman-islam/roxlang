@@ -24,7 +24,6 @@ ROX automatically namespaces all user-defined identifiers to prevent collisions 
 - **Reserved Components**: The following are NOT namespaced:
   - `main` function (entry point)
   - Built-in functions (`print`, `isOk`, etc.)
-  - Math library functions (`num32_abs`, `pi`, etc.)
   - Standard library constants (`true`, `false`, `none`)
 
 **Rule**: User identifiers **must not** begin with `roxv26_`. This prefix is reserved for the compiler.
@@ -55,19 +54,17 @@ ROX is a statically typed language. All types must be explicit.
 
 ### Primitive Types
 
-- `num`: 64-bit Signed Integer. The default integer type.
+- `int64`: 64-bit Signed Integer. The default integer type.
   ```rox
-  num x = 42;
-  ```
-- `num32`: 32-bit Signed Integer.
-
-  ```rox
-  num32 i = 10n;
+  int64 x = 42;
   ```
 
-- `float`: 64-bit Floating Point.
   ```rox
-  float f = 3.14;
+  ```
+
+- `float64`: 64-bit Floating Point.
+  ```rox
+  float64 f = 3.14;
   ```
 - `bool`: Boolean (`true` or `false`).
 - `char`: Single ASCII character.
@@ -84,11 +81,11 @@ ROX is a statically typed language. All types must be explicit.
 
 - `list[T]`: Dynamic Array. Ordered collection of elements of type `T`.
   ```rox
-  list[num] numbers = [1, 2, 3];
+  list[int64] numbers = [1, 2, 3];
   ```
 - `dictionary[K, V]`: Hash Map. Key-value pairs.
   ```rox
-  dictionary[string, num] scores;
+  dictionary[string, int64] scores;
   ```
 
 ### Result Type
@@ -96,10 +93,10 @@ ROX is a statically typed language. All types must be explicit.
 - `rox_result[T]`: Explicit error handling type.
 
   ```rox
-  rox_result[num] result = list.at(5);
+  rox_result[int64] result = list.at(5);
   if (isOk(result)) {
       // Safe to call getValue(result) here
-      num val = getValue(result);
+      int64 val = getValue(result);
   } else {
       print("Error: ", getError(result), "\n");
   }
@@ -153,7 +150,7 @@ Access is strictly checked and returns `rox_result[T]`.
 
 **Methods:**
 
-- `.size() -> num`
+- `.size() -> int64`
 - `.append(item) -> none`
 - `.pop() -> none`
 - `.at(index) -> rox_result[T]`
@@ -167,7 +164,7 @@ Key-value maps. Access returns `rox_result[V]`.
 - `.set(key, value) -> none`
 - `.remove(key) -> none`
 - `.has(key) -> bool`
-- `.size() -> num`
+- `.size() -> int64`
 - `.get(key) -> rox_result[V]`
 - `.getKeys() -> list[K]`
 
@@ -177,7 +174,7 @@ Immutable sequence of bytes.
 
 **Methods:**
 
-- `.size() -> num`
+- `.size() -> int64`
 - `.at(index) -> rox_result[char]`
 
 ## Functions
@@ -185,7 +182,7 @@ Immutable sequence of bytes.
 Functions are first-class citizens in ROX. They must specify parameter types and return types explicitly.
 
 ```rox
-function add(num a, num b) -> num {
+function add(int64 a, int64 b) -> int64 {
     return a + b;
 }
 ```
@@ -224,15 +221,15 @@ Functions can be assigned to variables, passed as arguments, and returned from o
 **Syntax for Function Types:** `function(paramType1, paramType2,...) -> returnType`
 
 ```rox
-function add(num a, num b) -> num {
+function add(int64 a, int64 b) -> int64 {
     return a + b;
 }
 
 // Assignment
-function(num, num) -> num op = add;
+function(int64, int64) -> int64 op = add;
 
 // Passing as argument
-function apply(function(num, num) -> num f, num a, num b) -> num {
+function apply(function(int64, int64) -> int64 f, int64 a, int64 b) -> int64 {
     return f(a, b);
 }
 
@@ -259,30 +256,25 @@ logger("Log this message\n");
 
 ## Math Library
 
-### `num` (64-bit)
+### `int64` (64-bit)
 
-- `num_abs(n)`
-- `num_min(a, b)`
-- `num_max(a, b)`
-- `num_pow(base, exp) -> rox_result[num]`
+- `int64_abs(n)`
+- `int64_min(a, b)`
+- `int64_max(a, b)`
+- `int64_pow(base, exp) -> rox_result[int64]`
 
-### `num32` (32-bit)
 
-- `num32_abs(n)`
-- `num32_min(a, b)`
-- `num32_max(a, b)`
-- `num32_pow(base, exp) -> rox_result[num32]`
 
-### `float` (double)
+### `float64` (double)
 
-- `float_abs(n)`
-- `float_min(a, b)`
-- `float_max(a, b)`
-- `float_pow(base, exp)`
-- `float_sqrt(n) -> rox_result[float]`
-- `float_sin, float_cos, float_tan`
-- `float_log, float_exp`
-- `float_floor, float_ceil`
+- `float64_abs(n)`
+- `float64_min(a, b)`
+- `float64_max(a, b)`
+- `float64_pow(base, exp)`
+- `float64_sqrt(n) -> rox_result[float64]`
+- `float64_sin, float64_cos, float64_tan`
+- `float64_log, float64_exp`
+- `float64_floor, float64_ceil`
 
 ### Constants
 
@@ -295,5 +287,5 @@ Single-line comments starting with `//`.
 
 ```rox
 // This is a comment
-num x = 10;
+int64 x = 10;
 ````

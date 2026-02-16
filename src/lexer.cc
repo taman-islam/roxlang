@@ -23,9 +23,8 @@ const std::unordered_map<std::string, TokenType>& Lexer::getKeywords() {
         {"not", TokenType::NOT},
         {"break", TokenType::BREAK},
         {"continue", TokenType::CONTINUE},
-        {"num32", TokenType::TYPE_NUM32},
-        {"num", TokenType::TYPE_NUM},
-        {"float", TokenType::TYPE_FLOAT},
+        {"int64", TokenType::TYPE_INT64},
+        {"float64", TokenType::TYPE_FLOAT64},
         {"bool", TokenType::TYPE_BOOL},
         {"char", TokenType::TYPE_CHAR},
         {"list", TokenType::TYPE_LIST},
@@ -42,13 +41,11 @@ const std::unordered_set<std::string>& Lexer::getBuiltins() {
         "isOk", "getValue", "getError", "ok", "error",
         // Constants not in keywords
         "pi", "e",
-        // Math Functions (num32)
-        "num32_abs", "num32_min", "num32_max", "num32_pow",
-        // Math Functions (num)
-        "num_abs", "num_min", "num_max", "num_pow",
-        // Math Functions (float)
-        "float_abs", "float_min", "float_max", "float_pow", "float_sqrt",
-        "float_sin", "float_cos", "float_tan", "float_log", "float_exp", "float_floor", "float_ceil",
+        // Math Functions (int64)
+        "int64_abs", "int64_min", "int64_max", "int64_pow",
+        // Math Functions (float64)
+        "float64_abs", "float64_min", "float64_max", "float64_pow", "float64_sqrt",
+        "float64_sin", "float64_cos", "float64_tan", "float64_log", "float64_exp", "float64_floor", "float64_ceil",
         // Collection Helpers
         "rox_at", "rox_set", "rox_remove", "rox_has", "rox_keys", "rox_div", "rox_mod", "rox_get",
         // Special
@@ -163,18 +160,10 @@ void Lexer::number() {
         return;
     }
 
-    // Look for n32 suffix
-    if (peek() == 'n') {
-        if (peekNext() == '3' && source.size() > current + 2 && source[current+2] == '2') {
-             advance(); // n
-             advance(); // 3
-             advance(); // 2
-             addToken(TokenType::NUMBER_INT); // num32
-             return;
-        }
-    }
+    // Look for n32 suffix - REMOVED
+    // if (peek() == 'n') { ... }
 
-    addToken(TokenType::NUMBER_INT); // num64 (default int)
+    addToken(TokenType::NUMBER_INT); // int64 (default int)
     return;
 }
 

@@ -1,15 +1,15 @@
 function main() -> none {
-    list[num] nums = [1, 2, 3];
-    rox_result[num] res = nums.at(0);
+    list[int64] int64s = [1, 2, 3];
+    rox_result[int64] res = int64s.at(0);
 
     if (isOk(res)) {
         // Safe here
-        num v1 = getValue(res);
+        int64 v1 = getValue(res);
 
         // Invalidate by reassignment
-        res = nums.at(1);
+        res = int64s.at(1);
 
         // Unsafe access: res is no longer proven safe
-        num v2 = getValue(res);
+        int64 v2 = getValue(res);
     }
 }

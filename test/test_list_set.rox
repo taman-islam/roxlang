@@ -1,8 +1,8 @@
 function main() -> none {
-    list[num] numbers = [10, 20, 30];
+    list[int64] numbers = [10, 20, 30];
 
     // Initial value
-    rox_result[num] val = numbers.at(1);
+    rox_result[int64] val = numbers.at(1);
     if (isOk(val)) {
         print("Initial: ", getValue(val), "\n");
     }

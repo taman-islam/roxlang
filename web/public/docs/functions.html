@@ -116,7 +116,7 @@
     <p>Functions are declared using the <code>function</code> keyword, followed by the function name, parameters, and
       return type.</p>
 
-    <pre><code>function add(num a, num b) -> num {
+    <pre><code>function add(int64 a, int64 b) -> int64 {
     return a + b;
 }</code></pre>
     <p><strong>Note</strong>: Function names (except <code>main</code>) are automatically namespaced by the compiler.
@@ -148,22 +148,22 @@
 
     <h3>Assigning to Variables</h3>
     <p>You can assign a function to a variable with a matching function type.</p>
-    <pre><code>function square(num x) -> num {
+    <pre><code>function square(int64 x) -> int64 {
     return x * x;
 }
 
-// Declare a variable 'op' that holds a function taking a num and returning a num
-function(num) -> num op = square;
+// Declare a variable 'op' that holds a function taking a int64 and returning a int64
+function(int64) -> int64 op = square;
 
 print(op(5)); // Output: 25</code></pre>
 
     <h3>Passing as Arguments</h3>
     <p>Functions can be passed to other functions (higher-order functions).</p>
-    <pre><code>function apply(function(num) -> num f, num val) -> num {
+    <pre><code>function apply(function(int64) -> int64 f, int64 val) -> int64 {
     return f(val);
 }
 
-function double(num x) -> num {
+function double(int64 x) -> int64 {
     return x * 2;
 }
 
@@ -184,7 +184,7 @@ logger("Log this message\n");</code></pre>
 
     <h2>Recursion</h2>
     <p>Recursive functions are fully supported.</p>
-    <pre><code>function factorial(num n) -> num {
+    <pre><code>function factorial(int64 n) -> int64 {
     if (n &lt;= 1) {
         return 1;
     }

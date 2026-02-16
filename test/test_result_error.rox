@@ -1,9 +1,9 @@
 function main() -> none {
-    list[num] l;
+    list[int64] l;
     l.append(1);
 
     // Out of bounds access returns error result
-    rox_result[num] res = l.at(5);
+    rox_result[int64] res = l.at(5);
 
     if (isOk(res)) {
         print("Error: Expected error result\n");
