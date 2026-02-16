@@ -11,7 +11,7 @@ enum class TokenType {
     // Single-character tokens.
     LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE,
     LEFT_BRACKET, RIGHT_BRACKET, COMMA, DOT, MINUS, PLUS,
-    SEMICOLON, SLASH, STAR, PERCENT,
+    SEMICOLON, SLASH, STAR, PERCENT, COLON,
 
     // One or two character tokens.
 
@@ -25,7 +25,7 @@ enum class TokenType {
     // Keywords.
     AND, ELSE, FALSE, FUNCTION, IF, CONST, NONE, OR,
     PRINT, RETURN, TRUE, FOR, NOT, READ_LINE,
-    BREAK, CONTINUE,
+    BREAK, CONTINUE, TYPE, DEFAULT,
 
     // Types
     TYPE_INT64, TYPE_FLOAT64, TYPE_BOOL, TYPE_CHAR, TYPE_STRING, TYPE_LIST, TYPE_DICT,

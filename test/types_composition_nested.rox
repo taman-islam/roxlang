@@ -1,0 +1,17 @@
+type Address {
+    city: string
+    country: string
+}
+
+type User {
+    id: int64
+    name: string
+    address: Address
+}
+
+function main() -> none {
+    Address a = Address{ city: "San Jose", country: "USA" };
+    User u = User{ id: 1, name: "Apon", address: a };
+
+    print(u.name, " @ ", u.address.city, ", ", u.address.country, "\n");
+}

@@ -1,0 +1,14 @@
+type Address {
+    city: string
+    country: string
+}
+
+type User {
+    id: int64
+    address: Address
+}
+
+function main() -> none {
+    User u = default(User);
+    print(u.id, " [", u.address.city, "] [", u.address.country, "]\n");
+}

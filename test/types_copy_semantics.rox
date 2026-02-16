@@ -1,0 +1,11 @@
+type Box {
+    n: int64
+}
+
+function main() -> none {
+    Box a = Box{ n: 1 };
+    Box b = a;
+    b.n = 99;
+
+    print("a=", a.n, " b=", b.n, "\n");
+}

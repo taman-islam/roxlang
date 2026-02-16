@@ -73,6 +73,13 @@ struct FunctionType : Type {
     }
 };
 
+struct RecordType : Type {
+    std::string name;
+    RecordType(std::string name) : name(std::move(name)) {}
+    std::string toString() const override { return name; }
+    std::unique_ptr<Type> clone() const override { return std::make_unique<RecordType>(name); }
+};
+
 // --- Expressions ---
 
 struct Expr {
@@ -140,6 +147,34 @@ struct MethodCallExpr : Expr {
     std::vector<std::unique_ptr<Expr>> arguments;
     MethodCallExpr(std::unique_ptr<Expr> object, Token name, std::vector<std::unique_ptr<Expr>> arguments)
         : object(std::move(object)), name(name), arguments(std::move(arguments)) {}
+};
+
+struct RecordInitExpr : Expr {
+    Token typeName;
+    struct FieldInit { Token name; std::unique_ptr<Expr> value; };
+    std::vector<FieldInit> fields;
+    RecordInitExpr(Token typeName, std::vector<FieldInit> fields)
+        : typeName(typeName), fields(std::move(fields)) {}
+};
+
+struct FieldAccessExpr : Expr {
+    std::unique_ptr<Expr> object;
+    Token fieldName;
+    FieldAccessExpr(std::unique_ptr<Expr> object, Token fieldName)
+        : object(std::move(object)), fieldName(fieldName) {}
+};
+
+struct FieldAssignExpr : Expr {
+    std::unique_ptr<Expr> object;
+    Token fieldName;
+    std::unique_ptr<Expr> value;
+    FieldAssignExpr(std::unique_ptr<Expr> object, Token fieldName, std::unique_ptr<Expr> value)
+        : object(std::move(object)), fieldName(fieldName), value(std::move(value)) {}
+};
+
+struct DefaultExpr : Expr {
+    std::unique_ptr<Type> type;
+    DefaultExpr(std::unique_ptr<Type> type) : type(std::move(type)) {}
 };
 
 // --- Statements ---
@@ -212,6 +247,14 @@ struct FunctionStmt : Stmt {
     std::vector<std::unique_ptr<Stmt>> body;
     FunctionStmt(Token name, std::vector<Param> params, std::unique_ptr<Type> returnType, std::vector<std::unique_ptr<Stmt>> body)
         : name(name), params(std::move(params)), returnType(std::move(returnType)), body(std::move(body)) {}
+};
+
+struct TypeDefStmt : Stmt {
+    Token name;
+    struct Field { Token name; std::unique_ptr<Type> type; };
+    std::vector<Field> fields;
+    TypeDefStmt(Token name, std::vector<Field> fields)
+        : name(name), fields(std::move(fields)) {}
 };
 
 } // namespace rox

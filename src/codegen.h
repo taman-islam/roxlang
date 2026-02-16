@@ -30,6 +30,7 @@ private:
     using Scope = std::unordered_map<std::string, VarInfo>;
     std::vector<Scope> scopes;
     std::unordered_set<std::string> iteratedVars; // collections currently being iterated
+    std::unordered_map<std::string, TypeDefStmt*> typeRegistry; // user-defined types
 
     void enterScope();
     void exitScope();
@@ -69,6 +70,11 @@ private:
     void genCall(CallExpr* expr);
     void genMethodCall(MethodCallExpr* expr);
     void genListLiteral(ListLiteralExpr* expr);
+    void genTypeDef(TypeDefStmt* stmt);
+    void genRecordInit(RecordInitExpr* expr);
+    void genFieldAccess(FieldAccessExpr* expr);
+    void genFieldAssign(FieldAssignExpr* expr);
+    void genDefault(DefaultExpr* expr);
 };
 
 } // namespace rox

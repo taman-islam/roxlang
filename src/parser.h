@@ -19,6 +19,7 @@ private:
 
     std::unique_ptr<Stmt> declaration();
     std::unique_ptr<Stmt> functionDeclaration(std::string kind);
+    std::unique_ptr<Stmt> typeDefinition();
     std::unique_ptr<Stmt> varDeclaration();
     std::unique_ptr<Stmt> statement();
     std::unique_ptr<Stmt> ifStatement();

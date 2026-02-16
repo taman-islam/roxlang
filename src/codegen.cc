@@ -60,7 +60,18 @@ void Codegen::invalidateVar(const std::string& name) {
 
 std::string Codegen::generate() {
     emitPreamble();
+
+    // First pass: collect type definitions and emit structs
     for (const auto& stmt : statements) {
+        if (auto* td = dynamic_cast<TypeDefStmt*>(stmt.get())) {
+            typeRegistry[td->name.lexeme] = td;
+            genTypeDef(td);
+        }
+    }
+
+    // Second pass: emit everything else
+    for (const auto& stmt : statements) {
+        if (dynamic_cast<TypeDefStmt*>(stmt.get())) continue; // already emitted
         genStmt(stmt.get());
     }
     return out.str();
@@ -328,6 +339,7 @@ void Codegen::genStmt(Stmt* stmt) {
     else if (auto* s = dynamic_cast<BreakStmt*>(stmt)) genBreak(s);
     else if (auto* s = dynamic_cast<ContinueStmt*>(stmt)) genContinue(s);
     else if (auto* s = dynamic_cast<LetStmt*>(stmt)) genLet(s);
+    else if (auto* s = dynamic_cast<TypeDefStmt*>(stmt)) genTypeDef(s);
     else if (auto* s = dynamic_cast<ExprStmt*>(stmt)) genExprStmt(s);
     else emitLine("// Unknown statement");
 }
@@ -350,6 +362,10 @@ void Codegen::genExpr(Expr* expr) {
     else if (auto* e = dynamic_cast<CallExpr*>(expr)) genCall(e);
     else if (auto* e = dynamic_cast<MethodCallExpr*>(expr)) genMethodCall(e);
     else if (auto* e = dynamic_cast<ListLiteralExpr*>(expr)) genListLiteral(e);
+    else if (auto* e = dynamic_cast<RecordInitExpr*>(expr)) genRecordInit(e);
+    else if (auto* e = dynamic_cast<FieldAccessExpr*>(expr)) genFieldAccess(e);
+    else if (auto* e = dynamic_cast<FieldAssignExpr*>(expr)) genFieldAssign(e);
+    else if (auto* e = dynamic_cast<DefaultExpr*>(expr)) genDefault(e);
     else emit("/* Unknown expr */");
 }
 
@@ -388,6 +404,8 @@ void Codegen::genType(Type* type) {
         out << "rox_result<";
         genType(t->valueType.get());
         out << ">";
+    } else if (auto* t = dynamic_cast<RecordType*>(type)) {
+        out << sanitize(t->name);
     }
 }
 
@@ -576,6 +594,12 @@ void Codegen::genLet(LetStmt* stmt) {
     declareVar(stmt->name.lexeme, stmt->type.get());
 
     if (!stmt->initializer) {
+        // Ban uninitialized records
+        if (dynamic_cast<RecordType*>(stmt->type.get())) {
+            std::cerr << "Compile Error: Uninitialized record. Use default("
+                      << stmt->type->toString() << ") or an explicit initializer." << std::endl;
+            exit(1);
+        }
         // No initializer -> default initialization
         out << "{};";
         out << "\n";
@@ -872,6 +896,10 @@ std::string Codegen::sanitize(const std::string& name) {
         return name;
     }
 
+    // Check if name is a user-defined type
+    if (typeRegistry.count(name)) {
+        return name;
+    }
 
     // Namespacing for user identifiers
     return "roxv26_" + name;
@@ -899,5 +927,146 @@ std::unique_ptr<Type> Codegen::inferType(Expr* expr) {
     return nullptr;
 }
 
-} // namespace rox
+void Codegen::genTypeDef(TypeDefStmt* stmt) {
+    out << "struct " << stmt->name.lexeme << " {\n";
+    for (const auto& field : stmt->fields) {
+        out << "  ";
+        genType(field.type.get());
+        out << " " << sanitize(field.name.lexeme) << ";\n";
+    }
+    out << "};\n\n";
+}
 
+void Codegen::genRecordInit(RecordInitExpr* expr) {
+    std::string typeName = expr->typeName.lexeme;
+    auto it = typeRegistry.find(typeName);
+    if (it == typeRegistry.end()) {
+        std::cerr << "Compile Error: Unknown type '" << typeName << "'." << std::endl;
+        exit(1);
+    }
+    TypeDefStmt* typeDef = it->second;
+
+    // Check for duplicate fields
+    std::unordered_set<std::string> seenFields;
+    for (const auto& fi : expr->fields) {
+        if (!seenFields.insert(fi.name.lexeme).second) {
+            std::cerr << "Compile Error: Duplicate field '" << fi.name.lexeme
+                      << "' in " << typeName << " initializer." << std::endl;
+            exit(1);
+        }
+    }
+
+    // Check for unknown fields
+    std::unordered_map<std::string, Type*> fieldTypes;
+    for (const auto& f : typeDef->fields) {
+        fieldTypes[f.name.lexeme] = f.type.get();
+    }
+    for (const auto& fi : expr->fields) {
+        if (fieldTypes.find(fi.name.lexeme) == fieldTypes.end()) {
+            std::cerr << "Compile Error: Unknown field '" << fi.name.lexeme
+                      << "' in type '" << typeName << "'." << std::endl;
+            exit(1);
+        }
+    }
+
+    // Check for missing fields
+    for (const auto& f : typeDef->fields) {
+        if (seenFields.find(f.name.lexeme) == seenFields.end()) {
+            std::cerr << "Compile Error: Missing field '" << f.name.lexeme
+                      << "' in " << typeName << " initializer." << std::endl;
+            exit(1);
+        }
+    }
+
+    // Check for type mismatches
+    for (const auto& fi : expr->fields) {
+        auto argType = inferType(fi.value.get());
+        Type* expectedType = fieldTypes[fi.name.lexeme];
+        if (argType && expectedType) {
+            if (argType->toString() != expectedType->toString()) {
+                std::cerr << "Type Error: Field '" << fi.name.lexeme << "' expects "
+                          << expectedType->toString() << " but got " << argType->toString()
+                          << "." << std::endl;
+                exit(1);
+            }
+        }
+    }
+
+    // Emit: TypeName{.field1 = val1, .field2 = val2}
+    out << typeName << "{";
+    for (size_t i = 0; i < expr->fields.size(); ++i) {
+        if (i > 0) out << ", ";
+        out << "." << sanitize(expr->fields[i].name.lexeme) << " = ";
+        genExpr(expr->fields[i].value.get());
+    }
+    out << "}";
+}
+
+void Codegen::genFieldAccess(FieldAccessExpr* expr) {
+    // Validate field exists if we can determine the type
+    if (auto* var = dynamic_cast<VariableExpr*>(expr->object.get())) {
+        VarInfo* info = resolveVar(var->name.lexeme);
+        if (info && info->type) {
+            if (auto* rt = dynamic_cast<RecordType*>(info->type)) {
+                auto it = typeRegistry.find(rt->name);
+                if (it != typeRegistry.end()) {
+                    bool found = false;
+                    for (const auto& f : it->second->fields) {
+                        if (f.name.lexeme == expr->fieldName.lexeme) { found = true; break; }
+                    }
+                    if (!found) {
+                        std::cerr << "Compile Error: Unknown field '" << expr->fieldName.lexeme
+                                  << "' on type '" << rt->name << "'." << std::endl;
+                        exit(1);
+                    }
+                }
+            }
+        }
+    }
+    genExpr(expr->object.get());
+    out << "." << sanitize(expr->fieldName.lexeme);
+}
+
+void Codegen::genFieldAssign(FieldAssignExpr* expr) {
+    genExpr(expr->object.get());
+    out << "." << sanitize(expr->fieldName.lexeme) << " = ";
+    genExpr(expr->value.get());
+}
+
+void Codegen::genDefault(DefaultExpr* expr) {
+    Type* t = expr->type.get();
+    if (auto* pt = dynamic_cast<PrimitiveType*>(t)) {
+        if (pt->token.type == TokenType::TYPE_INT64) { out << "((int64_t)0)"; return; }
+        if (pt->token.type == TokenType::TYPE_FLOAT64) { out << "0.0"; return; }
+        if (pt->token.type == TokenType::TYPE_BOOL) { out << "false"; return; }
+        if (pt->token.type == TokenType::TYPE_CHAR) { out << "'\\0'"; return; }
+        if (pt->token.type == TokenType::TYPE_STRING) { out << "rox_str(\"\")"; return; }
+        if (pt->token.type == TokenType::NONE) { out << "none"; return; }
+    }
+    if (auto* lt = dynamic_cast<ListType*>(t)) {
+        out << "std::vector<";
+        genType(lt->elementType.get());
+        out << ">{}";
+        return;
+    }
+    if (auto* dt = dynamic_cast<DictionaryType*>(t)) {
+        out << "std::unordered_map<";
+        genType(dt->keyType.get());
+        out << ", ";
+        genType(dt->valueType.get());
+        out << ">{}";
+        return;
+    }
+    if (auto* rt = dynamic_cast<RecordType*>(t)) {
+        auto it = typeRegistry.find(rt->name);
+        if (it == typeRegistry.end()) {
+            std::cerr << "Compile Error: Unknown type '" << rt->name << "'." << std::endl;
+            exit(1);
+        }
+        out << rt->name << "{}";
+        return;
+    }
+    out << "{}";
+}
+
+} // namespace rox

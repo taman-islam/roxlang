@@ -1,0 +1,10 @@
+type User {
+    id: int64
+    name: string
+}
+
+function main() -> none {
+    User foo = default(User);
+    print(foo.id, "\n");
+    print(foo.name, "\n");
+}

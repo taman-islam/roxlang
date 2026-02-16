@@ -22,6 +22,8 @@ const std::unordered_map<std::string, TokenType>& Lexer::getKeywords() {
         {"not", TokenType::NOT},
         {"break", TokenType::BREAK},
         {"continue", TokenType::CONTINUE},
+        {"type", TokenType::TYPE},
+        {"default", TokenType::DEFAULT},
         {"int64", TokenType::TYPE_INT64},
         {"float64", TokenType::TYPE_FLOAT64},
         {"bool", TokenType::TYPE_BOOL},
@@ -81,6 +83,7 @@ void Lexer::scanToken() {
         case ';': addToken(TokenType::SEMICOLON); break;
         case '*': addToken(TokenType::STAR); break;
         case '%': addToken(TokenType::PERCENT); break;
+        case ':': addToken(TokenType::COLON); break;
 
         case '=':
             addToken(match('=') ? TokenType::EQUAL_EQUAL : TokenType::EQUAL);

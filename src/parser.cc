@@ -18,6 +18,7 @@ std::unique_ptr<Stmt> Parser::declaration() {
         advance();
         return functionDeclaration("function");
     }
+    if (match({TokenType::TYPE})) return typeDefinition();
     if (match({TokenType::CONST})) return varDeclaration();
 
     // Check for variable declaration starting with a type
@@ -27,6 +28,11 @@ std::unique_ptr<Stmt> Parser::declaration() {
         check(TokenType::TYPE_LIST) ||
         check(TokenType::TYPE_DICT) || check(TokenType::TYPE_ROX_RESULT) ||
         check(TokenType::NONE) || check(TokenType::FUNCTION)) {
+        return varDeclaration();
+    }
+
+    // User-defined type as variable declaration: TypeName varName = ...
+    if (check(TokenType::IDENTIFIER) && peekNext().type == TokenType::IDENTIFIER) {
         return varDeclaration();
     }
 
@@ -59,6 +65,22 @@ std::unique_ptr<Stmt> Parser::functionDeclaration(std::string kind) {
     std::vector<std::unique_ptr<Stmt>> body = block();
 
     return std::make_unique<FunctionStmt>(name, std::move(params), std::move(returnType), std::move(body));
+}
+
+std::unique_ptr<Stmt> Parser::typeDefinition() {
+    Token name = consume(TokenType::IDENTIFIER, "Expect type name after 'type'.");
+    consume(TokenType::LEFT_BRACE, "Expect '{' after type name.");
+
+    std::vector<TypeDefStmt::Field> fields;
+    while (!check(TokenType::RIGHT_BRACE) && !isAtEnd()) {
+        Token fieldName = consume(TokenType::IDENTIFIER, "Expect field name.");
+        consume(TokenType::COLON, "Expect ':' after field name.");
+        std::unique_ptr<Type> fieldType = type();
+        fields.push_back({fieldName, std::move(fieldType)});
+    }
+    consume(TokenType::RIGHT_BRACE, "Expect '}' after type fields.");
+
+    return std::make_unique<TypeDefStmt>(name, std::move(fields));
 }
 
 std::unique_ptr<Stmt> Parser::varDeclaration() {
@@ -184,9 +206,14 @@ std::unique_ptr<Expr> Parser::assignment() {
 
         if (VariableExpr* v = dynamic_cast<VariableExpr*>(expr.get())) {
              Token name = v->name;
-             // We need to release ownership from expr since we are creating a new AssignmentExpr
-             // Actually, name is just a Token (copyable).
              return std::make_unique<AssignmentExpr>(name, std::move(value));
+        }
+
+        // Field assignment: obj.field = value
+        if (FieldAccessExpr* fa = dynamic_cast<FieldAccessExpr*>(expr.get())) {
+            Token fieldName = fa->fieldName;
+            std::unique_ptr<Expr> object = std::move(fa->object);
+            return std::make_unique<FieldAssignExpr>(std::move(object), fieldName, std::move(value));
         }
 
         error(equals, "Invalid assignment target.");
@@ -301,15 +328,21 @@ std::unique_ptr<Expr> Parser::call() {
             expr = std::make_unique<CallExpr>(std::move(expr), paren, std::move(arguments));
         } else if (match({TokenType::DOT})) {
             Token name = consume(TokenType::IDENTIFIER, "Expect property/method name after '.'.");
-            consume(TokenType::LEFT_PAREN, "Expect '(' after method name.");
-            std::vector<std::unique_ptr<Expr>> arguments;
-            if (!check(TokenType::RIGHT_PAREN)) {
-                do {
-                    arguments.push_back(expression());
-                } while (match({TokenType::COMMA}));
+            if (check(TokenType::LEFT_PAREN)) {
+                // Method call: obj.method(args)
+                advance(); // consume '('
+                std::vector<std::unique_ptr<Expr>> arguments;
+                if (!check(TokenType::RIGHT_PAREN)) {
+                    do {
+                        arguments.push_back(expression());
+                    } while (match({TokenType::COMMA}));
+                }
+                consume(TokenType::RIGHT_PAREN, "Expect ')' after arguments.");
+                expr = std::make_unique<MethodCallExpr>(std::move(expr), name, std::move(arguments));
+            } else {
+                // Field access: obj.field
+                expr = std::make_unique<FieldAccessExpr>(std::move(expr), name);
             }
-            consume(TokenType::RIGHT_PAREN, "Expect ')' after arguments.");
-            expr = std::make_unique<MethodCallExpr>(std::move(expr), name, std::move(arguments));
         } else {
             break;
         }
@@ -326,8 +359,43 @@ std::unique_ptr<Expr> Parser::primary() {
         return std::make_unique<LiteralExpr>(previous());
     }
 
+    if (match({TokenType::DEFAULT})) {
+        consume(TokenType::LEFT_PAREN, "Expect '(' after 'default'.");
+        std::unique_ptr<Type> t = type();
+        consume(TokenType::RIGHT_PAREN, "Expect ')' after default type.");
+        return std::make_unique<DefaultExpr>(std::move(t));
+    }
+
     if (match({TokenType::IDENTIFIER, TokenType::PRINT, TokenType::READ_LINE})) {
-        return std::make_unique<VariableExpr>(previous());
+        Token name = previous();
+        // Check for record init: TypeName{ field: value, ... }
+        // Disambiguate from IDENTIFIER followed by block: look for { IDENTIFIER : pattern
+        if (name.type == TokenType::IDENTIFIER && check(TokenType::LEFT_BRACE)) {
+            // Peek inside the brace: record init has { name: ... } or { }
+            bool isRecordInit = false;
+            if (current + 1 < tokens.size() && tokens[current + 1].type == TokenType::RIGHT_BRACE) {
+                isRecordInit = true; // Empty init: TypeName{}
+            } else if (current + 2 < tokens.size() &&
+                       tokens[current + 1].type == TokenType::IDENTIFIER &&
+                       tokens[current + 2].type == TokenType::COLON) {
+                isRecordInit = true; // TypeName{ field: ... }
+            }
+            if (isRecordInit) {
+                advance(); // consume '{'
+                std::vector<RecordInitExpr::FieldInit> fields;
+                if (!check(TokenType::RIGHT_BRACE)) {
+                    do {
+                        Token fieldName = consume(TokenType::IDENTIFIER, "Expect field name.");
+                        consume(TokenType::COLON, "Expect ':' after field name.");
+                        std::unique_ptr<Expr> value = expression();
+                        fields.push_back({fieldName, std::move(value)});
+                    } while (match({TokenType::COMMA}));
+                }
+                consume(TokenType::RIGHT_BRACE, "Expect '}' after record initializer.");
+                return std::make_unique<RecordInitExpr>(name, std::move(fields));
+            }
+        }
+        return std::make_unique<VariableExpr>(name);
     }
 
     if (match({TokenType::LEFT_BRACKET})) {
@@ -393,6 +461,11 @@ std::unique_ptr<Type> Parser::type() {
         consume(TokenType::GREATER, "Expect '->' after function parameters.");
         std::unique_ptr<Type> returnType = type();
         return std::make_unique<FunctionType>(std::move(paramTypes), std::move(returnType));
+    }
+
+    // User-defined type name
+    if (match({TokenType::IDENTIFIER})) {
+        return std::make_unique<RecordType>(previous().lexeme);
     }
 
     error(peek(), "Expect type.");

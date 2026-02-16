@@ -1,0 +1,15 @@
+type Counter {
+    value: int64
+}
+
+function inc(Counter c) -> Counter {
+    c.value = c.value + 1;
+    return c;
+}
+
+function main() -> none {
+    Counter c = Counter{ value: 0 };
+    c = inc(c);
+    c = inc(c);
+    print(c.value, "\n");
+}

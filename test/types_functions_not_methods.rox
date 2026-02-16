@@ -1,0 +1,13 @@
+type User {
+    id: int64
+    name: string
+}
+
+function label(User u) -> string {
+    return u.name;
+}
+
+function main() -> none {
+    User u = User{ id: 42, name: "ROX" };
+    print(label(u), " (#", u.id, ")\n");
+}

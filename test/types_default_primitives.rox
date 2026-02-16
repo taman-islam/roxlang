@@ -1,0 +1,8 @@
+function main() -> none {
+    string s = default(string);
+    print("[", s, "]\n");
+    int64 n = default(int64);
+    print(n, "\n");
+    bool b = default(bool);
+    print(b, "\n");
+}

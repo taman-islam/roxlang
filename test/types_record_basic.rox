@@ -1,0 +1,9 @@
+type User {
+    id: int64
+    name: string
+}
+
+function main() -> none {
+    User u = User{ id: 7, name: "Taman" };
+    print(u.id, " ", u.name, "\n");
+}
