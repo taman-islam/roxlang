@@ -102,6 +102,7 @@ test_fail "test/test_flow_invalid_2.rox" "getValue(res) is unsafe"
 test_fail "test/test_dict_fail.rox" "Type Error: Dictionary value type mismatch"
 test_fail "test/test_list_append_fail.rox" "Type Error: List append type mismatch"
 test_fail "test/test_range_fail.rox" "range() step cannot be 0"
+test_fail "test/test_iterate_mutate_fail.rox" "Cannot mutate"
 
 
 echo "--------------------------------"

@@ -463,7 +463,19 @@ void Codegen::genFor(ForStmt* stmt) {
     out << "for (auto " << sanitize(stmt->iterator.lexeme) << " : ";
     genExpr(stmt->iterable.get());
     out << ") ";
+
+    // Track the iterated variable to detect mutations during iteration
+    std::string iteratedName;
+    if (auto* var = dynamic_cast<VariableExpr*>(stmt->iterable.get())) {
+        iteratedName = var->name.lexeme;
+        iteratedVars.insert(iteratedName);
+    }
+
     genStmt(stmt->body.get());
+
+    if (!iteratedName.empty()) {
+        iteratedVars.erase(iteratedName);
+    }
 }
 
 void Codegen::genFunction(FunctionStmt* stmt) {
@@ -702,6 +714,19 @@ void Codegen::genCall(CallExpr* expr) {
 
 void Codegen::genMethodCall(MethodCallExpr* expr) {
     std::string method = expr->name.lexeme;
+
+    // Compile-time guard: block mutations on collections being iterated
+    static const std::unordered_set<std::string> mutatingMethods = {"append", "pop"};
+    if (mutatingMethods.count(method)) {
+        if (auto* var = dynamic_cast<VariableExpr*>(expr->object.get())) {
+            if (iteratedVars.count(var->name.lexeme)) {
+                std::cerr << "Compile Error: Cannot mutate '" << var->name.lexeme
+                          << "' while iterating over it." << std::endl;
+                exit(1);
+            }
+        }
+    }
+
     if (method == "at") {
         out << "rox_at(";
         genExpr(expr->object.get());

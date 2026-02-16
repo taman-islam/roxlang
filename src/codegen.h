@@ -29,6 +29,7 @@ private:
 
     using Scope = std::unordered_map<std::string, VarInfo>;
     std::vector<Scope> scopes;
+    std::unordered_set<std::string> iteratedVars; // collections currently being iterated
 
     void enterScope();
     void exitScope();
