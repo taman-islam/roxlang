@@ -115,13 +115,12 @@
     <p>ROX has a single loop construct: <code>for</code>. It iterates over a range of numbers.</p>
     <p>Syntax:</p>
     <ul>
-      <li><code>for var in range(start, end)</code> (step defaults to 1)</li>
       <li><code>for var in range(start, end, step)</code></li>
     </ul>
     <ul>
       <li><code>start</code>: Inclusive</li>
       <li><code>end</code>: Exclusive (stop before this value)</li>
-      <li><code>step</code>: Increment amount (optional)</li>
+      <li><code>step</code>: Increment amount (required, must not be 0)</li>
     </ul>
     <pre><code>// Print 0 to 4
 for i in range(0, 5, 1) {
@@ -133,13 +132,14 @@ for i in range(0, 5, 1) {
 for i in range(10, 0, -1) {
     // i is 10, 9, ... 1
 }</code></pre>
-    <p><strong>Note</strong>: <code>range</code> is a special built-in iterable construct that can only be used with
-      <code>for</code>. It does not return a list.</p>
+    <p><strong>Note</strong>: <code>range</code> is a standard built-in function. All 3 arguments are required.
+      Step must not be 0 (compile-time error for literal 0, runtime error otherwise).
+      Negative steps are supported.</p>
 
     <h2>Loop Control</h2>
     <h3>break</h3>
     <p>Terminates the nearest enclosing loop immediately.</p>
-    <pre><code>for i in range(0, 10) {
+    <pre><code>for i in range(0, 10, 1) {
     if (i == 5) {
         break; // Stop at 5
     }
@@ -148,7 +148,7 @@ for i in range(10, 0, -1) {
 
     <h3>continue</h3>
     <p>Skips the rest of the current iteration and proceeds to the next one.</p>
-    <pre><code>for i in range(0, 5) {
+    <pre><code>for i in range(0, 5, 1) {
     if (i % 2 == 0) {
         continue; // Skip even numbers
     }

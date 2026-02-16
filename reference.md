@@ -55,11 +55,13 @@ ROX is a statically typed language. All types must be explicit.
 ### Primitive Types
 
 - `int64`: 64-bit Signed Integer. The default integer type.
+
   ```rox
   int64 x = 42;
   ```
 
   ```rox
+
   ```
 
 - `float64`: 64-bit Floating Point.
@@ -123,17 +125,14 @@ if (x > 10) {
 ROX has a single loop construct: `for`.
 
 ```rox
-// Range(start, end, step)
+// range(start, end, step) - all 3 arguments required
 for i in range(0, 5, 1) { ... }
-
-// Range(start, end) - step defaults to 1
-for i in range(0, 5) { ... }
 
 // Backwards
 for i in range(10, 0, -1) { ... }
 ```
 
-**Note**: `range(start, end, step)` is a special built-in iterable construct that can only be used with `for`. It does not return a list.
+**Note**: `range(start, end, step)` is a standard built-in function. End is exclusive. Step must not be 0 (compile-time error if literal, runtime error otherwise). Negative steps are supported.
 
 ### Loop Control
 

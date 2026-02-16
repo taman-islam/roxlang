@@ -19,7 +19,6 @@ const std::unordered_map<std::string, TokenType>& Lexer::getKeywords() {
         {"return", TokenType::RETURN},
         {"true", TokenType::TRUE},
         {"for", TokenType::FOR},
-        {"range", TokenType::RANGE},
         {"not", TokenType::NOT},
         {"break", TokenType::BREAK},
         {"continue", TokenType::CONTINUE},
@@ -38,7 +37,7 @@ const std::unordered_map<std::string, TokenType>& Lexer::getKeywords() {
 const std::unordered_set<std::string>& Lexer::getBuiltins() {
     static const std::unordered_set<std::string> builtins = {
         // Core Functions
-        "isOk", "getValue", "getError", "ok", "error",
+        "isOk", "getValue", "getError", "ok", "error", "range",
         // Constants not in keywords
         "pi", "e",
         // Math Functions (int64)

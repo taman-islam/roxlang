@@ -1,6 +1,6 @@
 function main() -> none {
     list[int64] lst;
-    for i in range(0, 5) {
+    for i in range(0, 5, 1) {
         rox_result[int64] g = i%2;
         if(isOk(g)) {
             if(getValue(g) == 0) {
@@ -16,7 +16,7 @@ function main() -> none {
         print("Error: Expected size 2, got ", lst.size(), "\n");
         return;
     }
-    for i in range(0, lst.size()) {
+    for i in range(0, lst.size(), 1) {
         rox_result[int64] got = lst.at(i);
         if(isOk(got)) {
             if (not (getValue(got) == (i*2+1))) {

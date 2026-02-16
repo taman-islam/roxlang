@@ -1,0 +1,5 @@
+function main() -> none {
+    for i in range(0, 10, 0) {
+        print(i);
+    }
+}

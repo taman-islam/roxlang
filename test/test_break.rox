@@ -1,7 +1,7 @@
 function main() -> none {
     print(['T','e','s','t','i','n','g',' ','b','r','e','a','k','\n']);
     list[int64] lst;
-    for i in range(0, 5) {
+    for i in range(0, 5, 1) {
         if (i == 3) {
             break;
         }

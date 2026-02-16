@@ -72,8 +72,6 @@ std::string Formatter::format() {
                  if (t.type == TokenType::IDENTIFIER && next.type == TokenType::LEFT_PAREN) spaceAfter = false;
                  // print(...) no space
                  if (t.type == TokenType::PRINT && next.type == TokenType::LEFT_PAREN) spaceAfter = false;
-                 // range(...) no space
-                 if (t.type == TokenType::RANGE && next.type == TokenType::LEFT_PAREN) spaceAfter = false;
                  // -> no space
                  if (t.type == TokenType::MINUS && next.type == TokenType::GREATER) spaceAfter = false;
 

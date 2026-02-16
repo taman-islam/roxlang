@@ -89,6 +89,7 @@ run_test "test/test_pop.rox"
 run_test "test/test_regression.rox"
 run_test "test/test_result_error.rox"
 run_test "test/test_string.rox"
+run_test "test/test_range.rox"
 run_test "test/two_sum.rox"
 run_test "test/valid_parentheses.rox"
 
@@ -99,6 +100,7 @@ test_fail "test/test_flow_invalid_1.rox" "getValue(res) is unsafe"
 test_fail "test/test_flow_invalid_2.rox" "getValue(res) is unsafe"
 test_fail "test/test_dict_fail.rox" "Type Error: Dictionary value type mismatch"
 test_fail "test/test_list_append_fail.rox" "Type Error: List append type mismatch"
+test_fail "test/test_range_fail.rox" "range() step cannot be 0"
 
 
 echo "--------------------------------"

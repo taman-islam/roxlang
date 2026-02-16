@@ -195,13 +195,10 @@ struct IfStmt : Stmt {
 
 struct ForStmt : Stmt {
     Token iterator;
-    std::unique_ptr<Expr> start;
-    std::unique_ptr<Expr> end;
-    std::unique_ptr<Expr> step; // Can be null if default, but parser should probably fill it? Or Codegen.
-                                // Instruction says default 1.
+    std::unique_ptr<Expr> iterable; // e.g. range(0, 5, 1) as a CallExpr
     std::unique_ptr<Stmt> body;
-    ForStmt(Token iterator, std::unique_ptr<Expr> start, std::unique_ptr<Expr> end, std::unique_ptr<Expr> step, std::unique_ptr<Stmt> body)
-        : iterator(iterator), start(std::move(start)), end(std::move(end)), step(std::move(step)), body(std::move(body)) {}
+    ForStmt(Token iterator, std::unique_ptr<Expr> iterable, std::unique_ptr<Stmt> body)
+        : iterator(iterator), iterable(std::move(iterable)), body(std::move(body)) {}
 };
 
 struct FunctionStmt : Stmt {

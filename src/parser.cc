@@ -138,34 +138,18 @@ std::unique_ptr<Stmt> Parser::forStatement() {
     if (check(TokenType::IDENTIFIER) && peek().lexeme == "in") {
         advance();
     } else {
-        // Fallback or error if stricter check needed.
-        // For now, let's just assume it's there or handled by next check.
-        // Actually, let's consume it properly if we can.
-        // Since "in" isn't a keyword in token.h (my oversight in checking),
-        // it parses as IDENTIFIER.
-         if (peek().lexeme != "in") {
+        if (peek().lexeme != "in") {
              error(peek(), "Expect 'in' after iterator.");
-         }
-         advance();
+        }
+        advance();
     }
 
-    consume(TokenType::RANGE, "Expect 'range' after 'in'.");
-    consume(TokenType::LEFT_PAREN, "Expect '(' after 'range'.");
-
-    std::unique_ptr<Expr> start = expression();
-    consume(TokenType::COMMA, "Expect ',' after start.");
-    std::unique_ptr<Expr> end = expression();
-
-    std::unique_ptr<Expr> step = nullptr;
-    if (match({TokenType::COMMA})) {
-        step = expression();
-    }
-
-    consume(TokenType::RIGHT_PAREN, "Expect ')' after range arguments.");
+    // Parse the iterable expression (e.g. range(0, 5, 1))
+    std::unique_ptr<Expr> iterable = expression();
 
     std::unique_ptr<Stmt> body = statement();
 
-    return std::make_unique<ForStmt>(iterator, std::move(start), std::move(end), std::move(step), std::move(body));
+    return std::make_unique<ForStmt>(iterator, std::move(iterable), std::move(body));
 }
 
 std::unique_ptr<Stmt> Parser::returnStatement() {

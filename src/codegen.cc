@@ -121,6 +121,24 @@ void Codegen::emitPreamble() {
     out << "    return RoxString(s);\n";
     out << "}\n";
 
+    // RoxRange iterable
+    out << "struct RoxRange {\n";
+    out << "    int64_t start_, end_, step_;\n";
+    out << "    RoxRange(int64_t s, int64_t e, int64_t st) : start_(s), end_(e), step_(st) {\n";
+    out << "        if (st == 0) { std::cerr << \"Runtime Error: range() step cannot be 0.\" << std::endl; exit(1); }\n";
+    out << "    }\n";
+    out << "    struct Iterator {\n";
+    out << "        int64_t current, step, end;\n";
+    out << "        int64_t operator*() const { return current; }\n";
+    out << "        Iterator& operator++() { current += step; return *this; }\n";
+    out << "        bool operator!=(const Iterator& o) const {\n";
+    out << "            return step > 0 ? current < o.current : current > o.current;\n";
+    out << "        }\n";
+    out << "    };\n";
+    out << "    Iterator begin() const { return {start_, step_, end_}; }\n";
+    out << "    Iterator end() const { return {end_, step_, end_}; }\n";
+    out << "};\n\n";
+
     // Result type
     out << "template<typename T>\n";
     out << "struct rox_result {\n";
@@ -423,14 +441,27 @@ void Codegen::genIf(IfStmt* stmt) {
 }
 
 void Codegen::genFor(ForStmt* stmt) {
+    // Compile-time validation: check for literal step=0 in range() calls
+    if (auto* call = dynamic_cast<CallExpr*>(stmt->iterable.get())) {
+        auto* callee = dynamic_cast<VariableExpr*>(call->callee.get());
+        if (callee && callee->name.lexeme == "range") {
+            if (call->arguments.size() != 3) {
+                std::cerr << "Error: range() requires exactly 3 arguments: range(start, end, step)." << std::endl;
+                exit(1);
+            }
+            // Check for literal 0 step
+            if (auto* lit = dynamic_cast<LiteralExpr*>(call->arguments[2].get())) {
+                if (lit->value.type == TokenType::NUMBER_INT && lit->value.lexeme == "0") {
+                    std::cerr << "Error: range() step cannot be 0." << std::endl;
+                    exit(1);
+                }
+            }
+        }
+    }
+
     emitIndent();
-    out << "for (auto " << sanitize(stmt->iterator.lexeme) << " = ";
-    genExpr(stmt->start.get());
-    out << "; " << sanitize(stmt->iterator.lexeme) << " < ";
-    genExpr(stmt->end.get());
-    out << "; " << sanitize(stmt->iterator.lexeme) << " += ";
-    if (stmt->step) genExpr(stmt->step.get());
-    else out << "1";
+    out << "for (auto " << sanitize(stmt->iterator.lexeme) << " : ";
+    genExpr(stmt->iterable.get());
     out << ") ";
     genStmt(stmt->body.get());
 }
@@ -644,6 +675,19 @@ void Codegen::genCall(CallExpr* expr) {
                     exit(1);
                 }
             }
+        }
+    }
+
+    // Intercept range() calls to emit RoxRange constructor
+    if (auto* callee = dynamic_cast<VariableExpr*>(expr->callee.get())) {
+        if (callee->name.lexeme == "range") {
+            out << "RoxRange(";
+            for (size_t i = 0; i < expr->arguments.size(); ++i) {
+                if (i > 0) out << ", ";
+                genExpr(expr->arguments[i].get());
+            }
+            out << ")";
+            return;
         }
     }
 

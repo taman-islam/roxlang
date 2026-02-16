@@ -1,0 +1,32 @@
+function main() -> none {
+    // range(0, 5, 1) -> 0 1 2 3 4
+    for i in range(0, 5, 1) {
+        print(i);
+    }
+    print("\n");
+
+    // range(0, 10, 2) -> 0 2 4 6 8
+    for i in range(0, 10, 2) {
+        print(i);
+    }
+    print("\n");
+
+    // range(0, 0, 1) -> zero iterations
+    int64 count = 0;
+    for i in range(0, 0, 1) {
+        count = count + 1;
+    }
+    print(count, "\n");
+
+    // range(5, 0, -1) -> 5 4 3 2 1
+    for i in range(5, 0, -1) {
+        print(i);
+    }
+    print("\n");
+
+    // range(10, 0, -2) -> 10 8 6 4 2
+    for i in range(10, 0, -2) {
+        print(i);
+    }
+    print("\n");
+}
