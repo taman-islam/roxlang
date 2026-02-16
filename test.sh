@@ -90,6 +90,7 @@ run_test "test/test_regression.rox"
 run_test "test/test_result_error.rox"
 run_test "test/test_string.rox"
 run_test "test/test_range.rox"
+run_test "test/test_for_in_list.rox"
 run_test "test/two_sum.rox"
 run_test "test/valid_parentheses.rox"
 

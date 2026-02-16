@@ -1,0 +1,22 @@
+function main() -> none {
+    list[int64] nums = [10, 20, 30, 40, 50];
+    for n in nums {
+        print(n, " ");
+    }
+    print("\n");
+
+    // Empty list -> zero iterations
+    list[int64] empty = [];
+    int64 count = 0;
+    for x in empty {
+        count = count + 1;
+    }
+    print(count, "\n");
+
+    // List of chars
+    list[char] letters = ['a', 'b', 'c'];
+    for c in letters {
+        print(c);
+    }
+    print("\n");
+}
