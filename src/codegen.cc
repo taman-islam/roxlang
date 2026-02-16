@@ -698,6 +698,28 @@ void Codegen::genMethodCall(MethodCallExpr* expr) {
         genExpr(expr->object.get());
         out << ".pop_back()";
     } else if (method == "set") {
+        // Semantic Analysis: Check for dictionary type mismatch
+        auto objType = inferType(expr->object.get());
+        if (auto* dictType = dynamic_cast<DictionaryType*>(objType.get())) {
+             if (expr->arguments.size() < 2) {
+                 std::cerr << "Error: dictionary.set expects 2 arguments." << std::endl;
+                 exit(1);
+             }
+             auto keyType = inferType(expr->arguments[0].get());
+             auto valType = inferType(expr->arguments[1].get());
+
+             if (keyType && keyType->toString() != dictType->keyType->toString()) {
+                  std::cerr << "Type Error: Dictionary key type mismatch. Expected " << dictType->keyType->toString()
+                            << " but got " << keyType->toString() << "." << std::endl;
+                  exit(1);
+             }
+             if (valType && valType->toString() != dictType->valueType->toString()) {
+                  std::cerr << "Type Error: Dictionary value type mismatch. Expected " << dictType->valueType->toString()
+                            << " but got " << valType->toString() << "." << std::endl;
+                  exit(1);
+             }
+        }
+
         out << "rox_set(";
         genExpr(expr->object.get());
         out << ", ";
@@ -773,4 +795,27 @@ std::string Codegen::sanitize(const std::string& name) {
     return "roxv26_" + name;
 }
 
+std::unique_ptr<Type> Codegen::inferType(Expr* expr) {
+    if (!expr) return nullptr;
+
+    if (auto* lit = dynamic_cast<LiteralExpr*>(expr)) {
+        if (lit->value.type == TokenType::NUMBER_INT) return std::make_unique<PrimitiveType>(Token{TokenType::TYPE_INT64, "int64", lit->value.line});
+        if (lit->value.type == TokenType::NUMBER_FLOAT) return std::make_unique<PrimitiveType>(Token{TokenType::TYPE_FLOAT64, "float64", lit->value.line});
+        if (lit->value.type == TokenType::STRING) return std::make_unique<PrimitiveType>(Token{TokenType::TYPE_STRING, "string", lit->value.line});
+        if (lit->value.type == TokenType::CHAR_LITERAL) return std::make_unique<PrimitiveType>(Token{TokenType::TYPE_CHAR, "char", lit->value.line});
+        if (lit->value.type == TokenType::TRUE || lit->value.type == TokenType::FALSE) return std::make_unique<PrimitiveType>(Token{TokenType::TYPE_BOOL, "bool", lit->value.line});
+        if (lit->value.type == TokenType::NONE) return std::make_unique<PrimitiveType>(Token{TokenType::NONE, "none", lit->value.line});
+    }
+
+    if (auto* var = dynamic_cast<VariableExpr*>(expr)) {
+        VarInfo* info = resolveVar(var->name.lexeme);
+        if (info && info->type) {
+             return info->type->clone();
+        }
+    }
+
+    return nullptr;
+}
+
 } // namespace rox
+

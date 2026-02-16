@@ -45,6 +45,7 @@ private:
     void genStmt(Stmt* stmt);
     void genExpr(Expr* expr);
     void genType(Type* type);
+    std::unique_ptr<Type> inferType(Expr* expr);
 
     // Helpers for dispatch
     void genBlock(BlockStmt* stmt);

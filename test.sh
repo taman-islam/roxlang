@@ -97,6 +97,7 @@ test_fail "test/test_roxv26_prefix.rox"
 test_fail "test/test_string_fail.rox"
 test_fail "test/test_flow_invalid_1.rox" "getValue(res) is unsafe"
 test_fail "test/test_flow_invalid_2.rox" "getValue(res) is unsafe"
+test_fail "test/test_dict_fail.rox" "Type Error: Dictionary value type mismatch"
 
 
 echo "--------------------------------"
