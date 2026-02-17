@@ -41,7 +41,7 @@ const std::unordered_set<std::string>& Lexer::getBuiltins() {
         // Core Functions
         "isOk", "getValue", "getError", "ok", "error", "range",
         // Constants not in keywords
-        "pi", "e",
+        "pi", "e", "EOF",
         // Math Functions (int64)
         "int64_abs", "int64_min", "int64_max", "int64_pow",
         // Math Functions (float64)

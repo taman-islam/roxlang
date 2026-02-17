@@ -125,7 +125,8 @@ void cmd_format(const std::string& inputPath) {
     rox::Formatter formatter(tokens);
     std::string formatted = formatter.format();
 
-    std::cout << formatted;
+    writeFile(inputPath, formatted);
+    std::cout << "Formatted " << inputPath << std::endl;
 }
 
 int main(int argc, char* argv[]) {

@@ -1,0 +1,18 @@
+function main() -> none {
+    for i in range(0, 10, 1) {
+        print("Enter your name: ");
+        rox_result[string] line = read_line ();
+        if (isOk(line)) {
+            string name = getValue(line);
+            print("Hello, ", name, "!\n");
+        }
+        else if (getError(line) == EOF) {
+            print("Done!\n");
+            break;
+        }
+        else {
+            print("error occurred: ", getError(line), "\n");
+            break;
+        }
+    }
+}

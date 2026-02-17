@@ -192,7 +192,8 @@ void Codegen::emitPreamble() {
 
     // Built-in constants
     out << "const double pi = 3.141592653589793;\n";
-    out << "const double e  = 2.718281828459045;\n";    out << "\n";
+    out << "const double e  = 2.718281828459045;\n";
+    out << "const RoxString EOF_CONST = RoxString(\"EOF\");\n";    out << "\n";
     out << "// I/O\n";
     out << "std::ostream& operator<<(std::ostream& os, const std::vector<char>& s) {\n";
     out << "    for (char c : s) os << c;\n";
@@ -323,6 +324,13 @@ void Codegen::emitPreamble() {
     out << "\n";
     out << "\n";
     out << "\n";
+    out << "\n";
+    out << "// read_line: reads one line from stdin\n";
+    out << "rox_result<RoxString> read_line() {\n";
+    out << "    std::string line;\n";
+    out << "    if (!std::getline(std::cin, line)) return error<RoxString>(\"EOF\");\n";
+    out << "    return ok(RoxString(line));\n";
+    out << "}\n";
 
     out << "\n// End Runtime\n\n";
 }
@@ -686,6 +694,11 @@ void Codegen::genLiteral(LiteralExpr* expr) {
 }
 
 void Codegen::genVariable(VariableExpr* expr) {
+    // Map ROX EOF to C++ EOF_CONST (avoids collision with C macro)
+    if (expr->name.lexeme == "EOF") {
+        out << "EOF_CONST";
+        return;
+    }
     out << sanitize(expr->name.lexeme);
 }
 
@@ -723,6 +736,11 @@ void Codegen::genCall(CallExpr* expr) {
                 genExpr(expr->arguments[i].get());
             }
             out << ")";
+            return;
+        }
+        // Intercept read_line() — emit directly without namespacing
+        if (callee->name.lexeme == "read_line") {
+            out << "read_line()";
             return;
         }
     }
