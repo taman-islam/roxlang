@@ -232,10 +232,17 @@
     <h3>Built-in Functions</h3>
     <ul>
       <li><code>print(val...) -> none</code> (Variadic: accepts one or more arguments)</li>
+      <li><code>read_line() -> rox_result[string]</code> (reads one line from stdin)</li>
       <li><code>isOk(rox_result[T]) -> bool</code></li>
       <li><code>getValue(rox_result[T]) -> T</code></li>
       <li><code>getError(rox_result[T]) -> string</code></li>
       <li><code>default(T) -> T</code> (zero/empty value for any type)</li>
+    </ul>
+
+    <h3>Built-in Constants</h3>
+    <ul>
+      <li><code>pi</code>, <code>e</code> (float64)</li>
+      <li><code>EOF</code> (string) — error returned by <code>read_line()</code> on end of input</li>
     </ul>
 
     <h3>Comments</h3>

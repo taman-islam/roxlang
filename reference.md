@@ -202,8 +202,11 @@ for i in range(10, 0, -1) { ... }
 
 **Notes:**
 
-- `range(start, end, step)` is a standard built-in function. End is exclusive. Step must not be 0 (compile-time error if literal, runtime error otherwise). Negative steps are supported.
-- ROX intentionally has no while loop. Every loop must have an explicit upper bound - either via `range(start, upperBound, step)` + `break` or by iterating a finite collection. This guarantees all loops terminate.
+- ROX has no unbounded loop construct.
+- Every for loop iterates over:
+  - a finite `range(start, end, step)`, or
+  - a finite collection (e.g., `list[T]`).
+- `range` is bounded by `int64` arithmetic. Practical termination is guaranteed for well-formed inputs.
 
 ### Iterating Collections
 
@@ -344,6 +347,36 @@ logger("Log this message\n");
   - `default(dict[K,V])` → `{}`
   - `default(Record)` → fieldwise defaults (recursive)
 
+- `read_line() -> rox_result[string]`
+  - Reads one line from standard input.
+  - The returned string does not include the newline character.
+  - On end-of-file, returns err(EOF).
+  - On I/O failure, returns err(<error_message>).
+
+**Example: Echo stdin**
+
+```rox
+function main() -> none {
+    for i in range(0, 1000000, 1) {
+        rox_result[string] line = read_line();
+        if (isOk(line)) {
+            print(getValue(line), "\n");
+        } else if (getError(line) == EOF) {
+            break;
+        } else {
+            print("error: ", getError(line), "\n");
+            break;
+        }
+    }
+}
+```
+
+### Built-in Constants
+
+- `pi` (float64)
+- `e` (float64)
+- `EOF` (string) — error returned by `read_line()` on end of input
+
 ## Math Library
 
 ### `int64` (64-bit)
@@ -365,11 +398,6 @@ logger("Log this message\n");
 - `float64_sin, float64_cos, float64_tan`
 - `float64_log, float64_exp`
 - `float64_floor, float64_ceil`
-
-### Constants
-
-- `pi`
-- `e`
 
 ## Comments
 

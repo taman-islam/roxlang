@@ -99,10 +99,16 @@ ROX prioritizes clarity over convenience. Explicitness may cost more keystrokes,
 ### Built-in Functions
 
 - `print(val) -> none` (supports string, int64, float64, bool, char, list)
+- `read_line() -> rox_result[string]` (reads one line from stdin)
 - `isOk(rox_result[T]) -> bool`
 - `getValue(rox_result[T]) -> T`
 - `getError(rox_result[T]) -> string`
 - `default(T) -> T` (zero/empty value for any type)
+
+### Built-in Constants
+
+- `pi`, `e` (float64)
+- `EOF` (string) — error returned by `read_line()` on end of input
 
 ### Math Library
 
