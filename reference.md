@@ -53,7 +53,7 @@ ROX automatically namespaces all user-defined identifiers to prevent collisions 
 
 - `and`
 - `or`
-- `not`: Replaces `!`.
+- `not`: Replaces `!` and `!=`. e.g., `not (a == b)`.
 
 ## Types
 
@@ -172,7 +172,25 @@ function label(User u) -> string {
   }
   ```
 
-  **Safety Note**: `getValue(result)` can _only_ be called within an `if (isOk(result))` block. The compiler currently enforces this via strict flow-sensitive analysis. Reassigning `result` invalidates this check. Future versions may include smarter checking to support more complex flow patterns.
+  **Safety Note**: `getValue(result)` can only be called when the result is proven to be `ok`. The compiler enforces this via flow-sensitive analysis.
+
+  Supported patterns:
+  1. **If-Check**:
+     ```rox
+     if (isOk(result)) {
+         int64 val = getValue(result);
+     }
+     ```
+  2. **Early Return**:
+     ```rox
+     if (not(isOk(result))) {
+         return; // or break/continue
+     }
+     // Safe to use here
+     int64 val = getValue(result);
+     ```
+
+  Reassigning `result` invalidates these checks.
 
 ## Control Flow
 
