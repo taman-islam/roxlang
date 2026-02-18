@@ -150,14 +150,21 @@ app.post("/format", limiter, (req, res) => {
       cmd,
       { cwd: path.resolve(__dirname, "..") },
       (error, stdout, stderr) => {
-        // Delete temp file
-        fs.unlink(tempFile, () => {});
-
         if (error) {
+          fs.unlink(tempFile, () => {});
           return res.status(500).json({ error: stderr || error.message });
         }
 
-        res.json({ formatted: stdout });
+        fs.readFile(tempFile, "utf8", (readErr, data) => {
+          fs.unlink(tempFile, () => {});
+          if (readErr) {
+            console.error(readErr);
+            return res
+              .status(500)
+              .json({ error: "Error reading formatted file." });
+          }
+          res.json({ formatted: data });
+        });
       },
     );
   });
